@@ -182,6 +182,11 @@ def main():
 
     device = torch.device("cuda" if cuda else "cpu")
 
+    if not os.path.isfile(opt.query_file_path):
+        opt.query_file_path = join(PATCHNETVLAD_ROOT_DIR, 'dataset_imagenames', opt.query_file_path)
+    if not os.path.isfile(opt.index_file_path):
+        opt.index_file_path = join(PATCHNETVLAD_ROOT_DIR, 'dataset_imagenames', opt.index_file_path)
+
     dataset = PlaceDataset(opt.query_file_path, opt.index_file_path, opt.dataset_root_dir, opt.ground_truth_path, config['feature_extract'])
 
     feature_match(dataset, device, opt, config)
