@@ -74,10 +74,10 @@ Replace `performance.ini` with `speed.ini` or `storage.ini` if you want, and ada
 
 ```bash
 python feature_extract.py \
-  --config_path configs/performance.ini \
-  --dataset_file_path=dataset_imagenames/pitts30k_imageNames_index.txt \
+  --config_path patchnetvlad/configs/performance.ini \
+  --dataset_file_path=pitts30k_imageNames_index.txt \
   --dataset_root_dir=/path/to/your/pitts/dataset \
-  --output_features_dir output_features/pitts30k_index
+  --output_features_dir patchnetvlad/output_features/pitts30k_index
 ```
 
 Repeat for the query images by replacing `_index` with `_query`. Note that you have to adapt `dataset_root_dir`.
@@ -85,12 +85,12 @@ Repeat for the query images by replacing `_index` with `_query`. Note that you h
 ### Feature matching (dataset)
 ```bash
 python feature_match.py \
-  --config_path configs/performance.ini \
+  --config_path patchnetvlad/configs/performance.ini \
   --dataset_root_dir=/path/to/your/pitts/dataset \
-  --query_file_path=dataset_imagenames/pitts30k_imageNames_query.txt \
-  --index_file_path=dataset_imagenames/pitts30k_imageNames_index.txt \
-  --query_input_features_dir output_features/pitts30k_query \
-  --index_input_features_dir output_features/pitts30k_index \
+  --query_file_path=pitts30k_imageNames_query.txt \
+  --index_file_path=pitts30k_imageNames_index.txt \
+  --query_input_features_dir patchnetvlad/output_features/pitts30k_query \
+  --index_input_features_dir patchnetvlad/output_features/pitts30k_index \
   --ground_truth_path dataset_gt_files/pitts30k_test.npz \
   --result_save_folder results/pitts30k
 ```
