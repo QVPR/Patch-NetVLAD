@@ -91,8 +91,8 @@ python feature_match.py \
   --index_file_path=pitts30k_imageNames_index.txt \
   --query_input_features_dir patchnetvlad/output_features/pitts30k_query \
   --index_input_features_dir patchnetvlad/output_features/pitts30k_index \
-  --ground_truth_path dataset_gt_files/pitts30k_test.npz \
-  --result_save_folder results/pitts30k
+  --ground_truth_path patchnetvlad/dataset_gt_files/pitts30k_test.npz \
+  --result_save_folder patchnetvlad/results/pitts30k
 ```
 
 Note that providing `ground_truth_path` is optional.

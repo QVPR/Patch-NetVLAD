@@ -43,6 +43,7 @@ import os
 import argparse
 import configparser
 from os.path import join
+from os.path import exists
 import torch
 import numpy as np
 import faiss
@@ -70,6 +71,8 @@ def compute_recall(gt, predictions, numQ, n_values, recall_str=''):
 
 
 def write_kapture_output(opt, eval_set, predictions, outfile_name):
+    if not exists(opt.result_save_folder):
+        os.mkdir(opt.result_save_folder)
     with open(join(opt.result_save_folder, outfile_name), 'w') as kap_out:
         kap_out.write('# kapture format: 1.0\n')
         kap_out.write('# query_image, map_image\n')
@@ -82,6 +85,8 @@ def write_kapture_output(opt, eval_set, predictions, outfile_name):
 
 
 def write_recalls_output(opt, recalls_netvlad, recalls_patchnetvlad, n_values):
+    if not exists(opt.result_save_folder):
+        os.mkdir(opt.result_save_folder)
     with open(join(opt.result_save_folder, 'recalls.txt'), 'w') as rec_out:
         for n in n_values:
             rec_out.write("Recall {}@{}: {:.4f}\n".format('NetVLAD', n, recalls_netvlad[n]))
