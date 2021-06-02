@@ -158,7 +158,7 @@ def match_two(model, device, opt, config):
     scores, inlier_keypoints_one, inlier_keypoints_two = matcher.match(local_feats_one, local_feats_two)
     score = -normalise_func(scores, len(patch_sizes), patch_weights)
 
-    print("Similarity score between the two images is: '{:.5f}'. In this example, a larger score indicates a better match.".format(score))
+    print(f"Similarity score between the two images is: {score:.5f}. Larger scores indicate better matches.")
 
     if config['feature_match']['matcher'] == 'RANSAC':
         tqdm.write('====> Plotting Local Features')

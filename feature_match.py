@@ -73,7 +73,9 @@ def compute_recall(gt, predictions, numQ, n_values, recall_str=''):
 def write_kapture_output(opt, eval_set, predictions, outfile_name):
     if not exists(opt.result_save_folder):
         os.mkdir(opt.result_save_folder)
-    with open(join(opt.result_save_folder, outfile_name), 'w') as kap_out:
+    outfile = join(opt.result_save_folder, outfile_name)
+    print('Writing results to', outfile)
+    with open(outfile, 'w') as kap_out:
         kap_out.write('# kapture format: 1.0\n')
         kap_out.write('# query_image, map_image\n')
         image_list_array = np.array(eval_set.images)
@@ -87,7 +89,9 @@ def write_kapture_output(opt, eval_set, predictions, outfile_name):
 def write_recalls_output(opt, recalls_netvlad, recalls_patchnetvlad, n_values):
     if not exists(opt.result_save_folder):
         os.mkdir(opt.result_save_folder)
-    with open(join(opt.result_save_folder, 'recalls.txt'), 'w') as rec_out:
+    outfile = join(opt.result_save_folder, 'recalls.txt')
+    print('Writing recalls to', outfile)
+    with open(outfile, 'w') as rec_out:
         for n in n_values:
             rec_out.write("Recall {}@{}: {:.4f}\n".format('NetVLAD', n, recalls_netvlad[n]))
         for n in n_values:
@@ -120,7 +124,8 @@ def feature_match(eval_set, device, opt, config):
     if config['feature_match']['pred_input_path'] != 'None':
         predictions = np.load(config['feature_match']['pred_input_path'])  # optionally load predictions from a np file
     else:
-        if opt.ground_truth_path.split('/')[1][:-4] == 'tokyo247':
+        if opt.ground_truth_path and 'tokyo247' in opt.ground_truth_path:
+            print('Tokyo24/7: Selecting only one of the 12 cutouts per panorama')
             # followed nnSearchPostprocess in https://github.com/Relja/netvlad/blob/master/datasets/dbTokyo247.m
             # noinspection PyArgumentList
             _, predictions = faiss_index.search(qFeat, max(n_values) * 12)  # 12 cutouts per panorama
@@ -133,7 +138,7 @@ def feature_match(eval_set, device, opt, config):
             predictions = np.array(predictions_new)
         else:
             # noinspection PyArgumentList
-            _, predictions = faiss_index.search(qFeat, max(n_values))
+            _, predictions = faiss_index.search(qFeat, min(len(qFeat), max(n_values)))
 
     reranked_predictions = local_matcher(predictions, eval_set, input_query_local_features_prefix,
                                          input_index_local_features_prefix, config, device)
@@ -142,16 +147,19 @@ def feature_match(eval_set, device, opt, config):
     write_kapture_output(opt, eval_set, predictions, 'NetVLAD_predictions.txt')
     write_kapture_output(opt, eval_set, reranked_predictions, 'PatchNetVLAD_predictions.txt')
 
-    print('Finished matching features. About to eval GT if GT was provided')
+    print('Finished matching features.')
 
     # for each query get those within threshold distance
     if opt.ground_truth_path is not None:
+        print('Calculating recalls using ground truth.')
         gt = eval_set.get_positives()
 
         global_recalls = compute_recall(gt, predictions, eval_set.numQ, n_values, 'NetVLAD')
         local_recalls = compute_recall(gt, reranked_predictions, eval_set.numQ, n_values, 'PatchNetVLAD')
 
         write_recalls_output(opt, global_recalls, local_recalls, n_values)
+    else:
+        print('No ground truth was provided; not calculating recalls.')
 
 
 def main():
