@@ -35,31 +35,35 @@ The code is licensed under the [MIT License](./LICENSE).
 We recommend using conda (or better: mamba) to install all dependencies. If you have not yet installed conda/mamba, please download and install [`mambaforge`](https://github.com/conda-forge/miniforge).
 
 ```bash
-conda create -n patchnetvlad python=3.8 numpy pytorch torchvision natsort tqdm opencv pillow scikit-learn faiss -c conda-forge
+conda create -n patchnetvlad python=3.8 numpy pytorch torchvision natsort tqdm opencv pillow scikit-learn faiss matplotlib-base -c conda-forge
 
 conda activate patchnetvlad
 ```
 
-We provide several pre-trained models and configuration files. The pre-traine models will be downloaded automatically into the `pretrained_models` the first time feature extraction is performed.
+We provide several pre-trained models and configuration files. The pre-trained models will be downloaded automatically into the `pretrained_models` the first time feature extraction is performed.
 
-Alternatively, you can manually download the pre-trained models into a folder of your choice; we recommend into the `pretrained_models` folder (which is setup in the config files within the `configs` directory):
+<details>
+  <summary>Alternatively, you can manually download the pre-trained models into a folder of your choice; click to expand if you want to do so.</summary>
 
-```bash
-# Note: the pre-trained models will be downloaded automatically the first time feature extraction is performed
-# the steps below are optional!
+  We recommend downloading the models into the `pretrained_models` folder (which is setup in the config files within the `configs` directory):
 
-# You can use the download script which automatically downloads the models:
-python ./download_models.py
+  ```bash
+  # Note: the pre-trained models will be downloaded automatically the first time feature extraction is performed
+  # the steps below are optional!
 
-# Manual download:
-cd pretrained_models
-wget -O mapillary_WPCA128.pth.tar https://cloudstor.aarnet.edu.au/plus/s/vvr0jizjti0z2LR/download
-wget -O mapillary_WPCA512.pth.tar https://cloudstor.aarnet.edu.au/plus/s/DFxbGgFwh1y1wAz/download
-wget -O mapillary_WPCA4096.pth.tar https://cloudstor.aarnet.edu.au/plus/s/ZgW7DMEpeS47ELI/download
-wget -O pittsburgh_WPCA128.pth.tar https://cloudstor.aarnet.edu.au/plus/s/2ORvaCckitjz4Sd/download
-wget -O pittsburgh_WPCA512.pth.tar https://cloudstor.aarnet.edu.au/plus/s/WKl45MoboSyB4SH/download
-wget -O pittsburgh_WPCA4096.pth.tar https://cloudstor.aarnet.edu.au/plus/s/1aoTGbFjsekeKlB/download
-```
+  # You can use the download script which automatically downloads the models:
+  python ./download_models.py
+
+  # Manual download:
+  cd pretrained_models
+  wget -O mapillary_WPCA128.pth.tar https://cloudstor.aarnet.edu.au/plus/s/vvr0jizjti0z2LR/download
+  wget -O mapillary_WPCA512.pth.tar https://cloudstor.aarnet.edu.au/plus/s/DFxbGgFwh1y1wAz/download
+  wget -O mapillary_WPCA4096.pth.tar https://cloudstor.aarnet.edu.au/plus/s/ZgW7DMEpeS47ELI/download
+  wget -O pittsburgh_WPCA128.pth.tar https://cloudstor.aarnet.edu.au/plus/s/2ORvaCckitjz4Sd/download
+  wget -O pittsburgh_WPCA512.pth.tar https://cloudstor.aarnet.edu.au/plus/s/WKl45MoboSyB4SH/download
+  wget -O pittsburgh_WPCA4096.pth.tar https://cloudstor.aarnet.edu.au/plus/s/1aoTGbFjsekeKlB/download
+  ```
+</details>
 
 If you want to use the shortcuts `patchnetvlad-match-two`, `patchnetvlad-feature-match` and `patchnetvlad-feature-extract`, you also need to run (which also lets you use Patch-NetVLAD in a modular way):
 ```bash
@@ -115,9 +119,7 @@ We provide the `match_two.py` script which computes the Patch-NetVLAD features f
 The script will print a score value as an output, where a larger score indicates more similar images and a lower score means dissimilar images. The function also outputs a matching figure, showing the patch correspondances (after RANSAC) between the two images. The figure is saved as `results/patchMatchings.png`.
 
 ## FAQ
-<p style="width: 99%; display: block; margin-left: auto; margin-right: auto">
-  <img src="./assets/patch_netvlad_qualitative_results.jpg" alt="Patch-NetVLAD qualitative results"/>
-</p>
+![Patch-NetVLAD qualitative results](./assets/patch_netvlad_qualitative_results.jpg)
 
 ### How to Create New Ground Truth Files
 
