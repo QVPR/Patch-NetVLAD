@@ -33,6 +33,8 @@ import numpy as np
 from PIL import Image
 from sklearn.neighbors import NearestNeighbors
 
+from patchnetvlad.tools import PATCHNETVLAD_ROOT_DIR
+
 
 class PlaceDataset(data.Dataset):
     def __init__(self, query_file_path, index_file_path, dataset_root_dir, ground_truth_path, config):
@@ -52,6 +54,10 @@ class PlaceDataset(data.Dataset):
             self.images = self.database
 
         self.images = [os.path.join(dataset_root_dir, image) for image in self.images]
+        # check if images are relative to root dir
+        if not os.path.isfile(self.images[0]):
+            if os.path.isfile(os.path.join(PATCHNETVLAD_ROOT_DIR, self.images[0])):
+                self.images = [os.path.join(PATCHNETVLAD_ROOT_DIR, image) for image in self.images]
 
         self.positives = None
         self.distances = None

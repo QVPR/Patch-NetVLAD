@@ -1,4 +1,4 @@
-import os
+import os, sys
 from setuptools import setup, find_packages
 
 
@@ -8,6 +8,17 @@ here = os.path.abspath(os.path.dirname(__file__))
 with open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
+
+install_require_list = [
+    'numpy', 'torch', 'torchvision',
+    'tqdm', 'scipy', 'Pillow', 'scikit-learn',
+    'faiss', 'natsort']
+
+# workaround as opencv-python does not show up in "pip list" within a conda environment
+# we do not care as conda recipe has py-opencv requirement anyhow
+is_conda = os.path.exists(os.path.join(sys.prefix, 'conda-meta'))
+if not is_conda:
+    install_require_list.append('opencv-python')
 
 setup(name='patchnetvlad',
       version='0.1.0',
@@ -37,10 +48,7 @@ setup(name='patchnetvlad',
         'Programming Language :: Python :: 3.9',
       ],
       python_requires='>=3.6',
-      install_requires=[
-          'numpy', 'torch', 'torchvision',
-          'tqdm', 'scipy', 'Pillow', 'scikit-learn',
-          'faiss', 'natsort', 'opencv-python'],
+      install_requires=install_require_list,
       packages=find_packages(),
       keywords=[
           'python', 'place recognition', 'image retrieval', 'computer vision', 'robotics'

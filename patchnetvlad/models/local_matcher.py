@@ -149,17 +149,17 @@ def local_matcher(predictions, eval_set, input_query_local_features_prefix,
 
     for q_idx, pred in enumerate(tqdm(predictions, leave=False, desc='Patch compare pred')):
         diffs = np.zeros((predictions.shape[1], len(patch_sizes)))
-        image_name = os.path.splitext(os.path.basename(eval_set.images[eval_set.numDb + q_idx]))[0]
+        image_name_query = os.path.splitext(os.path.basename(eval_set.images[eval_set.numDb + q_idx]))[0]
         qfeat = []
         for patch_size in patch_sizes:
-            qfilename = input_query_local_features_prefix + '_' + 'psize{}_'.format(patch_size) + image_name + '.npy'
+            qfilename = input_query_local_features_prefix + '_' + 'psize{}_'.format(patch_size) + image_name_query + '.npy'
             qfeat.append(torch.transpose(torch.tensor(np.load(qfilename), device=device), 0, 1))
             # we pre-transpose here to save compute speed
         for k, candidate in enumerate(pred):
-            image_name = os.path.splitext(os.path.basename(eval_set.images[candidate]))[0]
+            image_name_index = os.path.splitext(os.path.basename(eval_set.images[candidate]))[0]
             dbfeat = []
             for patch_size in patch_sizes:
-                dbfilename = input_index_local_features_prefix + '_' + 'psize{}_'.format(patch_size) + image_name + '.npy'
+                dbfilename = input_index_local_features_prefix + '_' + 'psize{}_'.format(patch_size) + image_name_index + '.npy'
                 dbfeat.append(torch.tensor(np.load(dbfilename), device=device))
 
             diffs[k, :], _, _ = matcher.match(qfeat, dbfeat)
