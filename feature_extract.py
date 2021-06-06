@@ -134,15 +134,8 @@ def main():
 
     dataset = PlaceDataset(None, opt.dataset_file_path, opt.dataset_root_dir, None, config['feature_extract'])
 
-    # must load from a resume to do extraction
+    # must resume to do extraction
     resume_ckpt = config['global_params']['resumePath'] + config['global_params']['num_pcs'] + '.pth.tar'
-
-    model = get_model(encoder, encoder_dim, opt, config['global_params'], append_pca_layer=True)
-
-    if int(config['global_params']['nGPU']) > 1 and torch.cuda.device_count() > 1:
-        model.encoder = nn.DataParallel(model.encoder)
-        # if opt.mode.lower() != 'cluster':
-        model.pool = nn.DataParallel(model.pool)
 
     # backup: try whether resume_ckpt is relative to PATCHNETVLAD_ROOT_DIR
     if not isfile(resume_ckpt):
@@ -154,6 +147,16 @@ def main():
     if isfile(resume_ckpt):
         print("=> loading checkpoint '{}'".format(resume_ckpt))
         checkpoint = torch.load(resume_ckpt, map_location=lambda storage, loc: storage)
+        assert checkpoint['state_dict']['WPCA.0.bias'].shape[0] == int(config['global_params']['num_pcs'])
+        config['global_params']['num_clusters'] = str(checkpoint['state_dict']['pool.centroids'].shape[0])
+
+        model = get_model(encoder, encoder_dim, opt, config['global_params'], append_pca_layer=True)
+
+        if int(config['global_params']['nGPU']) > 1 and torch.cuda.device_count() > 1:
+            model.encoder = nn.DataParallel(model.encoder)
+            # if opt.mode.lower() != 'cluster':
+            model.pool = nn.DataParallel(model.pool)
+
         model.load_state_dict(checkpoint['state_dict'])
         model = model.to(device)
         print("=> loaded checkpoint '{}'".format(resume_ckpt, ))
