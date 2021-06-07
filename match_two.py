@@ -161,7 +161,7 @@ def match_two(model, device, opt, config):
     print(f"Similarity score between the two images is: {score:.5f}. Larger scores indicate better matches.")
 
     if config['feature_match']['matcher'] == 'RANSAC':
-        tqdm.write('====> Plotting Local Features')
+        tqdm.write('====> Plotting Local Features and save them to ' + str(join(opt.plot_save_path, 'patchMatchings.png')))
 
         # using cv2 for their in-built keypoint correspondence plotting tools
         cv_im_one = cv2.imread(opt.first_im_path, -1)
@@ -201,15 +201,8 @@ def main():
 
     encoder_dim, encoder = get_backend()
 
-    # must load from a resume to do extraction
+    # must resume to do extraction
     resume_ckpt = config['global_params']['resumePath'] + config['global_params']['num_pcs'] + '.pth.tar'
-
-    model = get_model(encoder, encoder_dim, opt, config['global_params'], append_pca_layer=True)
-
-    if int(config['global_params']['nGPU']) > 1 and torch.cuda.device_count() > 1:
-        model.encoder = nn.DataParallel(model.encoder)
-        # if opt.mode.lower() != 'cluster':
-        model.pool = nn.DataParallel(model.pool)
 
     # backup: try whether resume_ckpt is relative to script path
     if not isfile(resume_ckpt):
@@ -221,6 +214,16 @@ def main():
     if isfile(resume_ckpt):
         print("=> loading checkpoint '{}'".format(resume_ckpt))
         checkpoint = torch.load(resume_ckpt, map_location=lambda storage, loc: storage)
+        assert checkpoint['state_dict']['WPCA.0.bias'].shape[0] == int(config['global_params']['num_pcs'])
+        config['global_params']['num_clusters'] = str(checkpoint['state_dict']['pool.centroids'].shape[0])
+
+        model = get_model(encoder, encoder_dim, opt, config['global_params'], append_pca_layer=True)
+
+        if int(config['global_params']['nGPU']) > 1 and torch.cuda.device_count() > 1:
+            model.encoder = nn.DataParallel(model.encoder)
+            # if opt.mode.lower() != 'cluster':
+            model.pool = nn.DataParallel(model.pool)
+
         model.load_state_dict(checkpoint['state_dict'])
         model = model.to(device)
         print("=> loaded checkpoint '{}'".format(resume_ckpt, ))
