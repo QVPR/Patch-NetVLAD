@@ -21,7 +21,7 @@ if not is_conda:
     install_require_list.append('opencv-python')
 
 setup(name='patchnetvlad',
-      version='0.1.3',
+      version='0.1.4',
       description='Patch-NetVLAD: An open-source Python implementation of the CVPR2021 paper',
       long_description = long_description,
       long_description_content_type='text/markdown',
