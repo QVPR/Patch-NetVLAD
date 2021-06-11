@@ -136,3 +136,6 @@ The following mock example details the steps required to create a new ground tru
 
 ## Acknowledgements
 We would like to thank Gustavo Carneiro, Niko Suenderhauf and Mark Zolotas for their valuable comments in preparing this paper. This work received funding from the Australian Government, via grant AUSMURIB000001 associated with ONR MURI grant N00014-19-1-2571. The authors acknowledge continued support from the Queensland University of Technology (QUT) through the Centre for Robotics.
+
+## Related works
+Please check out [this collection](https://qcr.github.io/collection/vpr_overview/) of related works on place recognition.
