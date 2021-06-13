@@ -24,7 +24,7 @@ When using code within this repository, please refer the following paper in your
   title={Patch-NetVLAD: Multi-Scale Fusion of Locally-Global Descriptors for Place Recognition},
   author={Hausler, Stephen and Garg, Sourav and Xu, Ming and Milford, Michael and Fischer, Tobias},
   booktitle={Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition},
-  pages={},
+  pages={14141--14152},
   year={2021}
 }
 ```
