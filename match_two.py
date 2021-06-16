@@ -193,7 +193,7 @@ def main():
     config = configparser.ConfigParser()
     config.read(configfile)
 
-    cuda = opt.nocuda
+    cuda = not opt.nocuda
     if cuda and not torch.cuda.is_available():
         raise Exception("No GPU found, please run with --nocuda")
 
