@@ -36,12 +36,11 @@ Code is dynamic and can be configured with essentially *any* number of patch siz
 import argparse
 import configparser
 import os
-from os.path import join, exists, isfile
+from os.path import join, isfile
 
 from tqdm.auto import tqdm
 import torch
 import torch.nn as nn
-import torchvision.transforms as transforms
 import numpy as np
 import cv2
 from PIL import Image
@@ -50,39 +49,21 @@ from matplotlib import pyplot as plt
 
 from patchnetvlad.models.models_generic import get_backend, get_model, get_pca_encoding
 from patchnetvlad.tools.patch_matcher import PatchMatcher
+from patchnetvlad.tools.datasets import input_transform
 from patchnetvlad.models.local_matcher import calc_keypoint_centers_from_patches as calc_keypoint_centers_from_patches
 from patchnetvlad.tools import PATCHNETVLAD_ROOT_DIR
 
 
-def input_transform(resize=(480, 640)):
-    if resize[0] > 0 and resize[1] > 0:
-        return transforms.Compose([
-            transforms.Resize(resize),
-            transforms.ToTensor(),
-            transforms.Normalize(mean=[0.485, 0.456, 0.406],
-                                 std=[0.229, 0.224, 0.225]),
-        ])
-    else:
-        return transforms.Compose([
-            transforms.ToTensor(),
-            transforms.Normalize(mean=[0.485, 0.456, 0.406],
-                                 std=[0.229, 0.224, 0.225]),
-        ])
-
-
-def normalise_func(input_diff, num_patches, patch_weights):
-    normed_diff = 0
+def apply_patch_weights(input_scores, num_patches, patch_weights):
+    output_score = 0
     if len(patch_weights) != num_patches:
         raise ValueError('The number of patch weights must equal the number of patches used')
     for i in range(num_patches):
-        normed_diff = normed_diff + (patch_weights[i] * input_diff[i])
-    return normed_diff
+        output_score = output_score + (patch_weights[i] * input_scores[i])
+    return output_score
 
 
 def plot_two(cv_im_one, cv_im_two, inlier_keypoints_one, inlier_keypoints_two, plot_save_path):
-    # keypoint_colors = ['#a50026', '#d73027', '#f46d43', '#fdae61', '#fee090', '#e0f3f8', '#abd9e9', '#74add1', '#4575b4', '#313695']
-    # from PIL import ImageColor
-    # keypoint_colors = [ImageColor.getcolor(keypoint_color, "RGB") for keypoint_color in keypoint_colors]
 
     kp_all1 = []
     kp_all2 = []
@@ -95,32 +76,38 @@ def plot_two(cv_im_one, cv_im_two, inlier_keypoints_one, inlier_keypoints_two, p
 
     im_allpatch_matches = cv2.drawMatches(cv_im_one, kp_all1, cv_im_two, kp_all2,
                                           matches_all, None, matchColor=(0, 255, 0), flags=2)
+    if plot_save_path is None:
+        im_allpatch_matches = cv2.cvtColor(im_allpatch_matches, cv2.COLOR_RGB2BGR)
+        cv2.imshow('frame', im_allpatch_matches)
+    else:
+        im_allpatch_matches = cv2.cvtColor(im_allpatch_matches, cv2.COLOR_BGR2RGB)
 
-    im_allpatch_matches = cv2.cvtColor(im_allpatch_matches, cv2.COLOR_BGR2RGB)
-
-    plt.imshow(im_allpatch_matches)
-    # plt.show()
-    plt.axis('off')
-    filename = join(plot_save_path, 'patchMatchings.png')
-    plt.savefig(filename, dpi=300, bbox_inches='tight')
-    plt.close()
+        plt.imshow(im_allpatch_matches)
+        # plt.show()
+        plt.axis('off')
+        filename = join(plot_save_path, 'patchMatchings.png')
+        plt.savefig(filename, dpi=300, bbox_inches='tight')
+        plt.close()
 
 
-def match_two(model, device, opt, config):
+def match_two(model, device, config, im_one, im_two, plot_save_path):
 
     pool_size = int(config['global_params']['num_pcs'])
 
     model.eval()
 
-    im_one = Image.open(opt.first_im_path)
-    im_two = Image.open(opt.second_im_path)
-
     it = input_transform((int(config['feature_extract']['imageresizeH']), int(config['feature_extract']['imageresizeW'])))
 
-    im_one = it(im_one).unsqueeze(0)
-    im_two = it(im_two).unsqueeze(0)
+    im_one_pil = Image.fromarray(cv2.cvtColor(im_one, cv2.COLOR_BGR2RGB))
+    im_two_pil = Image.fromarray(cv2.cvtColor(im_two, cv2.COLOR_BGR2RGB))
 
-    input_data = torch.cat((im_one.to(device), im_two.to(device)), 0)
+    # im_one = Image.open(opt.first_im_path)
+    # im_two = Image.open(opt.second_im_path)
+
+    im_one_pil = it(im_one_pil).unsqueeze(0)
+    im_two_pil = it(im_two_pil).unsqueeze(0)
+
+    input_data = torch.cat((im_one_pil.to(device), im_two_pil.to(device)), 0)
 
     tqdm.write('====> Extracting Features')
     with torch.no_grad():
@@ -156,7 +143,7 @@ def match_two(model, device, opt, config):
                            all_indices)
 
     scores, inlier_keypoints_one, inlier_keypoints_two = matcher.match(local_feats_one, local_feats_two)
-    score = -normalise_func(scores, len(patch_sizes), patch_weights)
+    score = -apply_patch_weights(scores, len(patch_sizes), patch_weights)
 
     print(f"Similarity score between the two images is: {score:.5f}. Larger scores indicate better matches.")
 
@@ -164,13 +151,11 @@ def match_two(model, device, opt, config):
         tqdm.write('====> Plotting Local Features and save them to ' + str(join(opt.plot_save_path, 'patchMatchings.png')))
 
         # using cv2 for their in-built keypoint correspondence plotting tools
-        cv_im_one = cv2.imread(opt.first_im_path, -1)
-        cv_im_two = cv2.imread(opt.second_im_path, -1)
-        cv_im_one = cv2.resize(cv_im_one, (int(config['feature_extract']['imageresizeW']), int(config['feature_extract']['imageresizeH'])))
-        cv_im_two = cv2.resize(cv_im_two, (int(config['feature_extract']['imageresizeW']), int(config['feature_extract']['imageresizeH'])))
+        cv_im_one = cv2.resize(im_one, (int(config['feature_extract']['imageresizeW']), int(config['feature_extract']['imageresizeH'])))
+        cv_im_two = cv2.resize(im_two, (int(config['feature_extract']['imageresizeW']), int(config['feature_extract']['imageresizeH'])))
         # cv2 resize slightly different from torch, but for visualisation only not a big problem
 
-        plot_two(cv_im_one, cv_im_two, inlier_keypoints_one, inlier_keypoints_two, opt.plot_save_path)
+        plot_two(cv_im_one, cv_im_two, inlier_keypoints_one, inlier_keypoints_two, plot_save_path)
 
 
 def main():
@@ -193,7 +178,7 @@ def main():
     config = configparser.ConfigParser()
     config.read(configfile)
 
-    cuda = opt.nocuda
+    cuda = not opt.nocuda
     if cuda and not torch.cuda.is_available():
         raise Exception("No GPU found, please run with --nocuda")
 
@@ -230,7 +215,10 @@ def main():
     else:
         raise FileNotFoundError("=> no checkpoint found at '{}'".format(resume_ckpt))
 
-    match_two(model, device, opt, config)
+    im_one = cv2.imread(opt.first_im_path, -1)
+    im_two = cv2.imread(opt.second_im_path, -1)
+
+    match_two(model, device, config, im_one, im_two, opt.plot_save_path)
 
     torch.cuda.empty_cache()  # garbage clean GPU memory, a bug can occur when Pytorch doesn't automatically clear the
     # memory after runs

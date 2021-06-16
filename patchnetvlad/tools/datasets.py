@@ -36,6 +36,22 @@ from sklearn.neighbors import NearestNeighbors
 from patchnetvlad.tools import PATCHNETVLAD_ROOT_DIR
 
 
+def input_transform(resize=(480, 640)):
+    if resize[0] > 0 and resize[1] > 0:
+        return transforms.Compose([
+            transforms.Resize(resize),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406],
+                                 std=[0.229, 0.224, 0.225]),
+        ])
+    else:
+        return transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406],
+                                 std=[0.229, 0.224, 0.225]),
+        ])
+
+
 class PlaceDataset(data.Dataset):
     def __init__(self, query_file_path, index_file_path, dataset_root_dir, ground_truth_path, config):
         super().__init__()
@@ -63,7 +79,7 @@ class PlaceDataset(data.Dataset):
         self.distances = None
 
         self.resize = (int(config['imageresizeH']), int(config['imageresizeW']))
-        self.mytransform = self.input_transform(self.resize)
+        self.mytransform = input_transform(self.resize)
 
     def __getitem__(self, index):
         img = Image.open(self.images[index])
@@ -84,22 +100,6 @@ class PlaceDataset(data.Dataset):
             self.distances, self.positives = knn.radius_neighbors(self.utmQ, radius=self.posDistThr)
 
         return self.positives
-
-    @staticmethod
-    def input_transform(resize=(480, 640)):
-        if resize[0] > 0 and resize[1] > 0:
-            return transforms.Compose([
-                transforms.Resize(resize),
-                transforms.ToTensor(),
-                transforms.Normalize(mean=[0.485, 0.456, 0.406],
-                                     std=[0.229, 0.224, 0.225]),
-            ])
-        else:
-            return transforms.Compose([
-                transforms.ToTensor(),
-                transforms.Normalize(mean=[0.485, 0.456, 0.406],
-                                     std=[0.229, 0.224, 0.225]),
-            ])
 
     @staticmethod
     def parse_text_file(textfile):
