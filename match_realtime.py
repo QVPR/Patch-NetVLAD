@@ -45,121 +45,13 @@ import torchvision.transforms as transforms
 import numpy as np
 import cv2
 from PIL import Image
-from matplotlib import pyplot as plt
 
 
 from patchnetvlad.models.models_generic import get_backend, get_model, get_pca_encoding
 from patchnetvlad.tools.patch_matcher import PatchMatcher
-from patchnetvlad.models.local_matcher import calc_keypoint_centers_from_patches as calc_keypoint_centers_from_patches
+from patchnetvlad.models.local_matcher import calc_keypoint_centers_from_patches
 from patchnetvlad.tools import PATCHNETVLAD_ROOT_DIR
-
-
-def input_transform(resize=(480, 640)):
-    if resize[0] > 0 and resize[1] > 0:
-        return transforms.Compose([
-            transforms.Resize(resize),
-            transforms.ToTensor(),
-            transforms.Normalize(mean=[0.485, 0.456, 0.406],
-                                 std=[0.229, 0.224, 0.225]),
-        ])
-    else:
-        return transforms.Compose([
-            transforms.ToTensor(),
-            transforms.Normalize(mean=[0.485, 0.456, 0.406],
-                                 std=[0.229, 0.224, 0.225]),
-        ])
-
-
-def normalise_func(input_diff, num_patches, patch_weights):
-    normed_diff = 0
-    if len(patch_weights) != num_patches:
-        raise ValueError('The number of patch weights must equal the number of patches used')
-    for i in range(num_patches):
-        normed_diff = normed_diff + (patch_weights[i] * input_diff[i])
-    return normed_diff
-
-
-def plot_two(cv_im_one, cv_im_two, inlier_keypoints_one, inlier_keypoints_two):
-
-    kp_all1 = []
-    kp_all2 = []
-    matches_all = []
-    for this_inlier_keypoints_one, this_inlier_keypoints_two in zip(inlier_keypoints_one, inlier_keypoints_two):
-        for i in range(this_inlier_keypoints_one.shape[0]):
-            kp_all1.append(cv2.KeyPoint(this_inlier_keypoints_one[i, 0].astype(float), this_inlier_keypoints_one[i, 1].astype(float), 1, -1, 0, 0, -1))
-            kp_all2.append(cv2.KeyPoint(this_inlier_keypoints_two[i, 0].astype(float), this_inlier_keypoints_two[i, 1].astype(float), 1, -1, 0, 0, -1))
-            matches_all.append(cv2.DMatch(i, i, 0))
-
-    im_allpatch_matches = cv2.drawMatches(cv_im_one, kp_all1, cv_im_two, kp_all2,
-                                          matches_all, None, matchColor=(0, 255, 0), flags=2)
-
-    im_allpatch_matches = cv2.cvtColor(im_allpatch_matches, cv2.COLOR_RGB2BGR)
-
-    cv2.imshow('frame', im_allpatch_matches)
-
-
-def match_two(model, device, opt, config, im_one, im_two):
-
-    pool_size = int(config['global_params']['num_pcs'])
-
-    model.eval()
-
-    im_one_pil = Image.fromarray(cv2.cvtColor(im_one, cv2.COLOR_BGR2RGB))
-    im_two_pil = Image.fromarray(cv2.cvtColor(im_two, cv2.COLOR_BGR2RGB))
-
-    it = input_transform((int(config['feature_extract']['imageresizeH']), int(config['feature_extract']['imageresizeW'])))
-
-    im_one_pil = it(im_one_pil).unsqueeze(0)
-    im_two_pil = it(im_two_pil).unsqueeze(0)
-
-    input_data = torch.cat((im_one_pil.to(device), im_two_pil.to(device)), 0)
-
-    tqdm.write('====> Extracting Features')
-    with torch.no_grad():
-        image_encoding = model.encoder(input_data)
-
-        vlad_local, _ = model.pool(image_encoding)
-
-        local_feats_one = []
-        local_feats_two = []
-        for this_iter, this_local in enumerate(vlad_local):
-            this_local_feats = get_pca_encoding(model, this_local.permute(2, 0, 1).reshape(-1, this_local.size(1))). \
-                reshape(this_local.size(2), this_local.size(0), pool_size).permute(1, 2, 0)
-            local_feats_one.append(torch.transpose(this_local_feats[0, :, :], 0, 1))
-            local_feats_two.append(this_local_feats[1, :, :])
-
-    tqdm.write('====> Calculating Keypoint Positions')
-    patch_sizes = [int(s) for s in config['global_params']['patch_sizes'].split(",")]
-    strides = [int(s) for s in config['global_params']['strides'].split(",")]
-    patch_weights = np.array(config['feature_match']['patchWeights2Use'].split(",")).astype(float)
-
-    all_keypoints = []
-    all_indices = []
-
-    tqdm.write('====> Matching Local Features')
-    for patch_size, stride in zip(patch_sizes, strides):
-        # we currently only provide support for square patches, but this can be easily modified for future works
-        keypoints, indices = calc_keypoint_centers_from_patches(config['feature_match'], patch_size, patch_size, stride, stride)
-        all_keypoints.append(keypoints)
-        all_indices.append(indices)
-
-    matcher = PatchMatcher(config['feature_match']['matcher'], patch_sizes, strides, all_keypoints,
-                           all_indices)
-
-    scores, inlier_keypoints_one, inlier_keypoints_two = matcher.match(local_feats_one, local_feats_two)
-    score = -normalise_func(scores, len(patch_sizes), patch_weights)
-
-    print(f"Similarity score between the two images is: {score:.5f}. Larger scores indicate better matches.")
-
-    if config['feature_match']['matcher'] == 'RANSAC':
-        tqdm.write('====> Plotting Local Features')
-
-        # using cv2 for their in-built keypoint correspondence plotting tools
-        cv_im_one = cv2.resize(im_one, (int(config['feature_extract']['imageresizeW']), int(config['feature_extract']['imageresizeH'])))
-        cv_im_two = cv2.resize(im_two, (int(config['feature_extract']['imageresizeW']), int(config['feature_extract']['imageresizeH'])))
-        # cv2 resize slightly different from torch, but for visualisation only not a big problem
-
-        plot_two(cv_im_one, cv_im_two, inlier_keypoints_one, inlier_keypoints_two)
+from match_two import input_transform, normalise_func, plot_two, match_two
 
 
 def main():
@@ -215,7 +107,7 @@ def main():
     while(True):
         _, frame = vid.read()
 
-        match_two(model, device, opt, config, frame, last_frame)
+        match_two(model, device, config, frame, last_frame, None)
 
         key = cv2.waitKey(1)
         if key & 0xFF == ord('q'):
