@@ -36,12 +36,11 @@ Code is dynamic and can be configured with essentially *any* number of patch siz
 import argparse
 import configparser
 import os
-from os.path import join, exists, isfile
+from os.path import join, isfile
 
 from tqdm.auto import tqdm
 import torch
 import torch.nn as nn
-import torchvision.transforms as transforms
 import numpy as np
 import cv2
 from PIL import Image
@@ -50,33 +49,18 @@ from matplotlib import pyplot as plt
 
 from patchnetvlad.models.models_generic import get_backend, get_model, get_pca_encoding
 from patchnetvlad.tools.patch_matcher import PatchMatcher
+from patchnetvlad.tools.datasets import input_transform
 from patchnetvlad.models.local_matcher import calc_keypoint_centers_from_patches as calc_keypoint_centers_from_patches
 from patchnetvlad.tools import PATCHNETVLAD_ROOT_DIR
 
 
-def input_transform(resize=(480, 640)):
-    if resize[0] > 0 and resize[1] > 0:
-        return transforms.Compose([
-            transforms.Resize(resize),
-            transforms.ToTensor(),
-            transforms.Normalize(mean=[0.485, 0.456, 0.406],
-                                 std=[0.229, 0.224, 0.225]),
-        ])
-    else:
-        return transforms.Compose([
-            transforms.ToTensor(),
-            transforms.Normalize(mean=[0.485, 0.456, 0.406],
-                                 std=[0.229, 0.224, 0.225]),
-        ])
-
-
-def normalise_func(input_diff, num_patches, patch_weights):
-    normed_diff = 0
+def apply_patch_weights(input_scores, num_patches, patch_weights):
+    output_score = 0
     if len(patch_weights) != num_patches:
         raise ValueError('The number of patch weights must equal the number of patches used')
     for i in range(num_patches):
-        normed_diff = normed_diff + (patch_weights[i] * input_diff[i])
-    return normed_diff
+        output_score = output_score + (patch_weights[i] * input_scores[i])
+    return output_score
 
 
 def plot_two(cv_im_one, cv_im_two, inlier_keypoints_one, inlier_keypoints_two, plot_save_path):
@@ -159,7 +143,7 @@ def match_two(model, device, config, im_one, im_two, plot_save_path):
                            all_indices)
 
     scores, inlier_keypoints_one, inlier_keypoints_two = matcher.match(local_feats_one, local_feats_two)
-    score = -normalise_func(scores, len(patch_sizes), patch_weights)
+    score = -apply_patch_weights(scores, len(patch_sizes), patch_weights)
 
     print(f"Similarity score between the two images is: {score:.5f}. Larger scores indicate better matches.")
 

@@ -36,22 +36,16 @@ Code is dynamic and can be configured with essentially *any* number of patch siz
 import argparse
 import configparser
 import os
-from os.path import join, exists, isfile
+from os.path import join, isfile
 
-from tqdm.auto import tqdm
 import torch
 import torch.nn as nn
-import torchvision.transforms as transforms
-import numpy as np
 import cv2
-from PIL import Image
 
 
-from patchnetvlad.models.models_generic import get_backend, get_model, get_pca_encoding
-from patchnetvlad.tools.patch_matcher import PatchMatcher
-from patchnetvlad.models.local_matcher import calc_keypoint_centers_from_patches
+from patchnetvlad.models.models_generic import get_backend, get_model
 from patchnetvlad.tools import PATCHNETVLAD_ROOT_DIR
-from match_two import input_transform, normalise_func, plot_two, match_two
+from match_two import match_two
 
 
 def main():
