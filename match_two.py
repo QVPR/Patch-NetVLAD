@@ -148,7 +148,7 @@ def match_two(model, device, config, im_one, im_two, plot_save_path):
     print(f"Similarity score between the two images is: {score:.5f}. Larger scores indicate better matches.")
 
     if config['feature_match']['matcher'] == 'RANSAC':
-        tqdm.write('====> Plotting Local Features and save them to ' + str(join(opt.plot_save_path, 'patchMatchings.png')))
+        tqdm.write('====> Plotting Local Features and save them to ' + str(join(plot_save_path, 'patchMatchings.png')))
 
         # using cv2 for their in-built keypoint correspondence plotting tools
         cv_im_one = cv2.resize(im_one, (int(config['feature_extract']['imageresizeW']), int(config['feature_extract']['imageresizeH'])))
