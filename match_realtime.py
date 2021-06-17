@@ -73,6 +73,19 @@ def main():
     # must load from a resume to do extraction
     resume_ckpt = config['global_params']['resumePath'] + config['global_params']['num_pcs'] + '.pth.tar'
 
+    # backup: try whether resume_ckpt is relative to script path
+    if not isfile(resume_ckpt):
+        resume_ckpt = join(PATCHNETVLAD_ROOT_DIR, resume_ckpt)
+        if not isfile(resume_ckpt):
+            from download_models import download_all_models
+            download_all_models(ask_for_permission=True)
+
+    if isfile(resume_ckpt):
+        print("=> loading checkpoint '{}'".format(resume_ckpt))
+        checkpoint = torch.load(resume_ckpt, map_location=lambda storage, loc: storage)
+        assert checkpoint['state_dict']['WPCA.0.bias'].shape[0] == int(config['global_params']['num_pcs'])
+        config['global_params']['num_clusters'] = str(checkpoint['state_dict']['pool.centroids'].shape[0])
+
     model = get_model(encoder, encoder_dim, opt, config['global_params'], append_pca_layer=True)
 
     if int(config['global_params']['nGPU']) > 1 and torch.cuda.device_count() > 1:
