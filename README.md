@@ -4,13 +4,18 @@
 [![GitHub issues](https://img.shields.io/github/issues/QVPR/Patch-NetVLAD.svg?style=flat-square)](https://github.com/QVPR/Patch-NetVLAD/issues)
 [![GitHub closed issues](https://img.shields.io/github/issues-closed-raw/QVPR/Patch-NetVLAD?style=flat-square)](https://github.com/QVPR/Patch-NetVLAD/issues?q=is%3Aissue+is%3Aclosed)
 [![GitHub repo size](https://img.shields.io/github/repo-size/QVPR/Patch-NetVLAD.svg?style=flat-square)](./README.md)
-[![QUT Centre for Robotics](https://img.shields.io/badge/collection-QUT%20Robotics-%23043d71?style=flat-square)](https://qcr.ai)
+[![QUT Centre for Robotics](https://img.shields.io/badge/collection-QUT%20Robotics-%23043d71?style=flat-square)](https://qcr.github.io/collection/vpr_overview/)
 
-
+[![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/patch-netvlad-multi-scale-fusion-of-locally/visual-localization-on-extended-cmu-seasons&style=flat-square)](https://paperswithcode.com/sota/visual-localization-on-extended-cmu-seasons?p=patch-netvlad-multi-scale-fusion-of-locally)
+[![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/patch-netvlad-multi-scale-fusion-of-locally/visual-place-recognition-on-mapillary-val&style=flat-square)](https://paperswithcode.com/sota/visual-place-recognition-on-mapillary-val?p=patch-netvlad-multi-scale-fusion-of-locally)
+[![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/patch-netvlad-multi-scale-fusion-of-locally/visual-place-recognition-on-nordland&style=flat-square)](https://paperswithcode.com/sota/visual-place-recognition-on-nordland?p=patch-netvlad-multi-scale-fusion-of-locally)
+[![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/patch-netvlad-multi-scale-fusion-of-locally/visual-place-recognition-on-pittsburgh-30k&style=flat-square)](https://paperswithcode.com/sota/visual-place-recognition-on-pittsburgh-30k?p=patch-netvlad-multi-scale-fusion-of-locally)
+[![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/patch-netvlad-multi-scale-fusion-of-locally/visual-localization-on-robotcar-seasons-v2&style=flat-square)](https://paperswithcode.com/sota/visual-localization-on-robotcar-seasons-v2?p=patch-netvlad-multi-scale-fusion-of-locally)
+[![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/patch-netvlad-multi-scale-fusion-of-locally/visual-place-recognition-on-tokyo247&style=flat-square)](https://paperswithcode.com/sota/visual-place-recognition-on-tokyo247?p=patch-netvlad-multi-scale-fusion-of-locally)
 
 This repository contains code for the CVPR2021 paper "Patch-NetVLAD: Multi-Scale Fusion of Locally-Global Descriptors for Place Recognition"
 
-A pre-print version of the article can be found at: https://arxiv.org/abs/2103.01486
+The article can be found on [arXiv](https://arxiv.org/abs/2103.01486) and the [official proceedings](https://openaccess.thecvf.com/content/CVPR2021/html/Hausler_Patch-NetVLAD_Multi-Scale_Fusion_of_Locally-Global_Descriptors_for_Place_Recognition_CVPR_2021_paper.html).
 
 <p style="width: 50%; display: block; margin-left: auto; margin-right: auto">
   <img src="./assets/patch_netvlad_method_diagram.png" alt="Patch-NetVLAD method diagram"/>
@@ -18,7 +23,7 @@ A pre-print version of the article can be found at: https://arxiv.org/abs/2103.0
 
 ## License + attribution/citation
 
-When using code within this repository, please refer the following paper in your publications:
+When using code within this repository, please refer the following [paper](https://openaccess.thecvf.com/content/CVPR2021/html/Hausler_Patch-NetVLAD_Multi-Scale_Fusion_of_Locally-Global_Descriptors_for_Place_Recognition_CVPR_2021_paper.html) in your publications:
 ```
 @inproceedings{hausler2021patchnetvlad,
   title={Patch-NetVLAD: Multi-Scale Fusion of Locally-Global Descriptors for Place Recognition},
