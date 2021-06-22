@@ -116,7 +116,7 @@ This will create three output files in the folder specified by `result_save_fold
 python match_two.py \
 --config_path patchnetvlad/configs/performance.ini \
 --first_im_path=patchnetvlad/example_images/tokyo_query.jpg \
---second_im_path=patchnetvlad/example_images/tokyo_db_patch_success.png
+--second_im_path=patchnetvlad/example_images/tokyo_db.png
 ```
 
 We provide the `match_two.py` script which computes the Patch-NetVLAD features for two given images and then determines the local feature matching between these images. While we provide example images, any image pair can be used.

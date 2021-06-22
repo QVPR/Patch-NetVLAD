@@ -101,9 +101,6 @@ def match_two(model, device, config, im_one, im_two, plot_save_path):
     im_one_pil = Image.fromarray(cv2.cvtColor(im_one, cv2.COLOR_BGR2RGB))
     im_two_pil = Image.fromarray(cv2.cvtColor(im_two, cv2.COLOR_BGR2RGB))
 
-    # im_one = Image.open(opt.first_im_path)
-    # im_two = Image.open(opt.second_im_path)
-
     im_one_pil = it(im_one_pil).unsqueeze(0)
     im_two_pil = it(im_two_pil).unsqueeze(0)
 
@@ -217,7 +214,11 @@ def main():
         raise FileNotFoundError("=> no checkpoint found at '{}'".format(resume_ckpt))
 
     im_one = cv2.imread(opt.first_im_path, -1)
+    if im_one is None:
+        raise FileNotFoundError(opt.first_im_path + " does not exist")
     im_two = cv2.imread(opt.second_im_path, -1)
+    if im_two is None:
+        raise FileNotFoundError(opt.second_im_path + " does not exist")
 
     match_two(model, device, config, im_one, im_two, opt.plot_save_path)
 
