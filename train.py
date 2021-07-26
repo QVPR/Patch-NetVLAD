@@ -433,10 +433,10 @@ if __name__ == "__main__":
 
     criterion = nn.TripletMarginLoss(margin=float(config['train']['margin']) ** 0.5, p=2, reduction='sum').to(device)
 
+    model = model.to(device)
+
     if opt.resume_path:
         optimizer.load_state_dict(checkpoint['optimizer'])
-
-    model = model.to(device)
 
     print('===> Loading dataset(s)')
     exlude_panos_training = not opt.includepanos
