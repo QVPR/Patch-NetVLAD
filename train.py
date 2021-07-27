@@ -278,7 +278,10 @@ def get_clusters(cluster_set):
 
 
 def save_checkpoint(state, is_best_sofar, filename='checkpoint.pth.tar'):
-    model_out_path = join(opt.save_file_path, filename)
+    if opt.save_every_epoch:
+        model_out_path = join(opt.save_file_path, 'checkpoint_epoch' + str(state['epoch']) + '.pth.tar')
+    else:
+        model_out_path = join(opt.save_file_path, filename)
     torch.save(state, model_out_path)
     if is_best_sofar:
         shutil.copyfile(model_out_path, join(opt.save_file_path, 'model_best.pth.tar'))
@@ -305,6 +308,7 @@ if __name__ == "__main__":
     parser.add_argument('--nEpochs', type=int, default=30, help='number of epochs to train for')
     parser.add_argument('--start_epoch', default=0, type=int, metavar='N',
                         help='manual epoch number (useful on restarts)')
+    parser.add_argument('--save_every_epoch', action='store_true', help='Flag to set a separate checkpoint file for each new epoch')
 
     parser.add_argument('--threads', type=int, default=6, help='Number of threads for each data loader to use')
     parser.add_argument('--nocuda', action='store_true', help='If true, use CPU only. Else use GPU.')
