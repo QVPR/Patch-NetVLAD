@@ -16,7 +16,9 @@ from tqdm import tqdm
 #           "tokyo", "toronto", "saopaulo", "moscow", "zurich", "paris", "bangkok",
 #           "budapest", "austin", "berlin", "ottawa", "phoenix", "goa", "amman", "nairobi", "manila"],
 default_cities = {
-    'train': ["trondheim"], # for debugging only
+    'train': ["trondheim", "london", "boston", "melbourne", "amsterdam", "helsinki",
+           "tokyo", "toronto", "saopaulo", "moscow", "zurich", "paris", "bangkok",
+           "budapest", "austin", "berlin", "ottawa", "phoenix", "goa", "amman", "nairobi", "manila"],
     'val': ["cph", "sf"],
     'test': ["miami", "athens", "buenosaires", "stockholm", "bengaluru", "kampala"]
 }
