@@ -94,7 +94,7 @@ def train(epoch_num, config):
 
     for subIter in trange(train_dataset.nCacheSubset, desc='Cache refresh'.rjust(15), position=1):
         pool_size = encoder_dim
-        if opt.pooling.lower() == 'netvlad':
+        if config['global_params']['pooling'].lower() == 'netvlad':
             pool_size *= int(config['global_params']['num_clusters'])
 
         tqdm.write('====> Building Cache')
@@ -180,8 +180,8 @@ def test(eval_set, epoch_num=0, write_tboard=False, pbar_position=0):
     with torch.no_grad():
         tqdm.write('====> Extracting Features')
         pool_size = encoder_dim
-        if opt.pooling.lower() == 'netvlad':
-            pool_size *= opt.num_clusters
+        if config['global_params']['pooling'].lower() == 'netvlad':
+            pool_size *= int(config['global_params']['num_clusters'])
         qFeat = np.empty((len(eval_set_queries), pool_size), dtype=np.float32)
         dbFeat = np.empty((len(eval_set_dbs), pool_size), dtype=np.float32)
 
@@ -247,7 +247,7 @@ def get_clusters(cluster_set):
         makedirs(join(opt.cache_path, 'centroids'))
 
     initcache_clusters = join(opt.cache_path, 'centroids',
-                              opt.arch + '_' + opt.trainset + '_' + config['train']['numclusters'] + '_desc_cen.hdf5')
+                              'vgg16_' + opt.trainset + '_' + config['train']['numclusters'] + '_desc_cen.hdf5')
     with h5py.File(initcache_clusters, mode='w') as h5_file:
         with torch.no_grad():
             model.eval()
@@ -278,10 +278,10 @@ def get_clusters(cluster_set):
 
 
 def save_checkpoint(state, is_best_sofar, filename='checkpoint.pth.tar'):
-    model_out_path = join(opt.savePath, filename)
+    model_out_path = join(opt.save_file_path, filename)
     torch.save(state, model_out_path)
     if is_best_sofar:
-        shutil.copyfile(model_out_path, join(opt.savePath, 'model_best.pth.tar'))
+        shutil.copyfile(model_out_path, join(opt.save_file_path, 'model_best.pth.tar'))
 
 
 if __name__ == "__main__":
@@ -300,36 +300,14 @@ if __name__ == "__main__":
     parser.add_argument('--identifier', type=str, default='mapillary_nopanos',
                         help='Description of this model, e.g. mapillary_nopanos_vgg16_netvlad')
 
-    parser.add_argument('--mode', type=str, default='train', help='Mode', choices=['train', 'compute_pca'])
     parser.add_argument('--trainset', type=str, default='mapillary', help='Which training set to use', choices=['mapillary, pitts'])
+    parser.add_argument('--includepanos', action='store_true', help='Train with panoramas included (only valid for mapillary)')
     parser.add_argument('--nEpochs', type=int, default=30, help='number of epochs to train for')
     parser.add_argument('--start_epoch', default=0, type=int, metavar='N',
                         help='manual epoch number (useful on restarts)')
 
     parser.add_argument('--threads', type=int, default=6, help='Number of threads for each data loader to use')
     parser.add_argument('--nocuda', action='store_true', help='If true, use CPU only. Else use GPU.')
-
-
-    parser.add_argument('--dataPath', type=str, default='/media/sandisk/netvlad20/data/',
-                        help='Path for centroid data.')
-    parser.add_argument('--runsPath', type=str, default='/media/sandisk/netvlad20/runs/', help='Path to save runs to.')
-    parser.add_argument('--savePath', type=str, default='checkpoints',
-                        help='Path to save checkpoints to in logdir. Default=checkpoints/')
-
-    parser.add_argument('--ckpt', type=str, default='latest',
-                        help='Resume from latest or best checkpoint.', choices=['latest', 'best'])
-    parser.add_argument('--arch', type=str, default='vgg16',
-                        help='basenetwork to use', choices=['vgg16', 'alexnet', 'vgg16_remove_9'])
-    parser.add_argument('--pooling', type=str, default='netvlad', help='type of pooling to use',
-                        choices=['netvlad', 'max', 'avg'])
-    parser.add_argument('--use_pca', type=str, default=None, choices=['PCA', 'WPCA'])
-    parser.add_argument('--num_pcs', type=int, default=4096,
-                        help='Number of principal components for PCA. Default=4096')
-    parser.add_argument('--split', type=str, default='val', help='Data split to use for testing. Default is val',
-                        choices=['test', 'train', 'val'])
-    parser.add_argument('--fromscratch', action='store_true',
-                        help='Train from scratch rather than using pretrained models')
-    parser.add_argument('--includepanos', action='store_true', help='Train with panoramas included')
 
 
     opt = parser.parse_args()
@@ -401,7 +379,7 @@ if __name__ == "__main__":
         # a little hacky, but needed to easily run init_params
         model = model.to(device="cpu")
 
-        initcache = join(opt.cache_path, 'centroids', opt.arch + '_' + opt.trainset + '_' + config['train'][
+        initcache = join(opt.cache_path, 'centroids', 'vgg16_' + opt.trainset + '_' + config['train'][
                                       'numclusters'] + '_desc_cen.hdf5')
         with h5py.File(initcache, mode='r') as h5:
             clsts = h5.get("centroids")[...]
@@ -457,8 +435,7 @@ if __name__ == "__main__":
     # write checkpoints in logdir
     logdir = writer.file_writer.get_logdir()
     opt.save_file_path = join(logdir, 'checkpoints')
-    if not opt.resume_path:
-        makedirs(opt.save_file_path)
+    makedirs(opt.save_file_path)
 
     not_improved = 0
     best_score = 0
@@ -491,7 +468,7 @@ if __name__ == "__main__":
                 'parallel': isParallel,
             }, is_best)
 
-            if opt.patience > 0 and not_improved > (int(config['train']['patience']) / int(config['train']['evalevery'])):
+            if int(config['train']['patience']) > 0 and not_improved > (int(config['train']['patience']) / int(config['train']['evalevery'])):
                 print('Performance did not improve for', config['train']['patience'], 'epochs. Stopping.')
                 break
 
