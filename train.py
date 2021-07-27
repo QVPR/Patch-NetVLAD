@@ -247,7 +247,7 @@ def get_clusters(cluster_set):
         makedirs(join(opt.cache_path, 'centroids'))
 
     initcache_clusters = join(opt.cache_path, 'centroids',
-                              'vgg16_' + opt.trainset + '_' + config['train']['numclusters'] + '_desc_cen.hdf5')
+                              'vgg16_' + opt.trainset + '_' + config['train']['num_clusters'] + '_desc_cen.hdf5')
     with h5py.File(initcache_clusters, mode='w') as h5_file:
         with torch.no_grad():
             model.eval()
@@ -269,7 +269,7 @@ def get_clusters(cluster_set):
 
         tqdm.write('====> Clustering..')
         niter = 100
-        kmeans = faiss.Kmeans(encoder_dim, int(config['train']['numclusters']), niter=niter, verbose=False)
+        kmeans = faiss.Kmeans(encoder_dim, int(config['train']['num_clusters']), niter=niter, verbose=False)
         kmeans.train(dbFeat[...])
 
         tqdm.write('====> Storing centroids ' + str(kmeans.centroids.shape))
@@ -353,8 +353,6 @@ if __name__ == "__main__":
             opt.start_epoch = checkpoint['epoch']
 
             print("=> loaded checkpoint '{}'".format(opt.resume_path, ))
-
-            print('debugpoint')
         else:
             raise FileNotFoundError("=> no checkpoint found at '{}'".format(opt.resume))
     else: # if not, assume fresh training instance and will initially generate cluster centroids
@@ -380,7 +378,7 @@ if __name__ == "__main__":
         model = model.to(device="cpu")
 
         initcache = join(opt.cache_path, 'centroids', 'vgg16_' + opt.trainset + '_' + config['train'][
-                                      'numclusters'] + '_desc_cen.hdf5')
+                                      'num_clusters'] + '_desc_cen.hdf5')
         with h5py.File(initcache, mode='r') as h5:
             clsts = h5.get("centroids")[...]
             traindescs = h5.get("descriptors")[...]
