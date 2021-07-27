@@ -43,6 +43,7 @@ import tempfile
 
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 
 import torch.optim as optim
 from torch.utils.data import DataLoader, SubsetRandomSampler
@@ -257,6 +258,8 @@ def get_clusters(cluster_set):
             for iteration, (input_data, indices) in enumerate(tqdm(cluster_data_loader, desc='Iter'.rjust(15)), 1):
                 input_data = input_data.to(device)
                 image_descriptors = model.encoder(input_data).view(input_data.size(0), encoder_dim, -1).permute(0, 2, 1)
+                image_descriptors = F.normalize(image_descriptors, p=2, dim=2) # we L2-norm descriptors before vlad so
+                # need to L2-norm here as well
 
                 batchix = (iteration - 1) * int(config['train']['cachebatchsize']) * nPerImage
                 for ix in range(image_descriptors.size(0)):
