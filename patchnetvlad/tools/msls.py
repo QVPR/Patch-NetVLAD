@@ -386,7 +386,7 @@ class MSLS(Dataset):
         self.triplets = []
 
         # if there is no network associate to the cache, then we don't do any hard negative mining.
-        # Instead we just create som naive triplets based on distance.
+        # Instead we just create some naive triplets based on distance.
         if net is None:
             qidxs = np.random.choice(len(self.qIdx), self.cached_queries, replace=False)
 

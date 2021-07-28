@@ -301,6 +301,8 @@ if __name__ == "__main__":
                         help='Path to save checkpoints to')
     parser.add_argument('--resume_path', type=str, default='',
                         help='Full path and name (with extension) to load checkpoint from, for resuming training.')
+    parser.add_argument('--cluster_path', type=str, default='',
+                        help='Full path and name (with extension) to load cluster data from, for resuming training.')
     parser.add_argument('--dataset_root_dir', type=str, default='/work/qvpr/data/raw/Mapillary_Street_Level_Sequences',
                         help='Root directory of dataset')
     parser.add_argument('--identifier', type=str, default='mapillary_nopanos',
@@ -361,9 +363,8 @@ if __name__ == "__main__":
 
             print("=> loaded checkpoint '{}'".format(opt.resume_path, ))
         else:
-            raise FileNotFoundError("=> no checkpoint found at '{}'".format(opt.resume))
+            raise FileNotFoundError("=> no checkpoint found at '{}'".format(opt.resume_path))
     else: # if not, assume fresh training instance and will initially generate cluster centroids
-        resume_pca = False
         print('===> Finding cluster centroids')
 
         print('===> Loading dataset(s) for clustering')
@@ -376,16 +377,24 @@ if __name__ == "__main__":
 
         model = get_model(encoder, encoder_dim, opt, config['global_params'], append_pca_layer=False)
 
-        model = model.to(device)
-
-        print('===> Calculating descriptors and clusters')
-        get_clusters(train_dataset)
-
-        # a little hacky, but needed to easily run init_params
-        model = model.to(device="cpu")
-
         initcache = join(opt.cache_path, 'centroids', 'vgg16_' + opt.trainset + '_' + config['train'][
                                       'num_clusters'] + '_desc_cen.hdf5')
+
+        if opt.cluster_path:
+            if isfile(opt.cluster_path):
+                if opt.cluster_path != initcache:
+                    shutil.copyfile(opt.cluster_path, initcache)
+            else:
+                raise FileNotFoundError("=> no cluster data found at '{}'".format(opt.cluster_path))
+        else:
+            model = model.to(device)
+
+            print('===> Calculating descriptors and clusters')
+            get_clusters(train_dataset)
+
+            # a little hacky, but needed to easily run init_params
+            model = model.to(device="cpu")
+
         with h5py.File(initcache, mode='r') as h5:
             clsts = h5.get("centroids")[...]
             traindescs = h5.get("descriptors")[...]
