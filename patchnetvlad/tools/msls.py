@@ -12,9 +12,7 @@ import sys
 import itertools
 from tqdm import tqdm
 
-# 'train': ["trondheim", "london", "boston", "melbourne", "amsterdam", "helsinki",
-#           "tokyo", "toronto", "saopaulo", "moscow", "zurich", "paris", "bangkok",
-#           "budapest", "austin", "berlin", "ottawa", "phoenix", "goa", "amman", "nairobi", "manila"],
+
 default_cities = {
     'train': ["trondheim", "london", "boston", "melbourne", "amsterdam", "helsinki",
            "tokyo", "toronto", "saopaulo", "moscow", "zurich", "paris", "bangkok",

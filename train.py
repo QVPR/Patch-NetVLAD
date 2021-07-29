@@ -248,7 +248,7 @@ def get_clusters(cluster_set):
         makedirs(join(opt.cache_path, 'centroids'))
 
     initcache_clusters = join(opt.cache_path, 'centroids',
-                              'vgg16_' + opt.trainset + '_' + config['train']['num_clusters'] + '_desc_cen.hdf5')
+                              'vgg16_' + 'mapillary_' + config['train']['num_clusters'] + '_desc_cen.hdf5')
     with h5py.File(initcache_clusters, mode='w') as h5_file:
         with torch.no_grad():
             model.eval()
@@ -307,14 +307,10 @@ if __name__ == "__main__":
                         help='Root directory of dataset')
     parser.add_argument('--identifier', type=str, default='mapillary_nopanos',
                         help='Description of this model, e.g. mapillary_nopanos_vgg16_netvlad')
-
-    parser.add_argument('--trainset', type=str, default='mapillary', help='Which training set to use', choices=['mapillary, pitts'])
-    parser.add_argument('--includepanos', action='store_true', help='Train with panoramas included (only valid for mapillary)')
     parser.add_argument('--nEpochs', type=int, default=30, help='number of epochs to train for')
     parser.add_argument('--start_epoch', default=0, type=int, metavar='N',
                         help='manual epoch number (useful on restarts)')
     parser.add_argument('--save_every_epoch', action='store_true', help='Flag to set a separate checkpoint file for each new epoch')
-
     parser.add_argument('--threads', type=int, default=6, help='Number of threads for each data loader to use')
     parser.add_argument('--nocuda', action='store_true', help='If true, use CPU only. Else use GPU.')
 
@@ -377,7 +373,7 @@ if __name__ == "__main__":
 
         model = get_model(encoder, encoder_dim, opt, config['global_params'], append_pca_layer=False)
 
-        initcache = join(opt.cache_path, 'centroids', 'vgg16_' + opt.trainset + '_' + config['train'][
+        initcache = join(opt.cache_path, 'centroids', 'vgg16_' + 'mapillary_' + config['train'][
                                       'num_clusters'] + '_desc_cen.hdf5')
 
         if opt.cluster_path:
@@ -431,7 +427,7 @@ if __name__ == "__main__":
         optimizer.load_state_dict(checkpoint['optimizer'])
 
     print('===> Loading dataset(s)')
-    exlude_panos_training = not opt.includepanos
+    exlude_panos_training = not config['train'].getboolean('includepanos')
     train_dataset = MSLS(opt.dataset_root_dir, mode='train', transform=input_transform(),
                          bs=int(config['train']['cachebatchsize']), threads=opt.threads, margin=float(config['train']['margin']),
                          exclude_panos=exlude_panos_training)
