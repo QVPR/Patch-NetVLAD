@@ -361,14 +361,7 @@ if __name__ == "__main__":
         else:
             raise FileNotFoundError("=> no checkpoint found at '{}'".format(opt.resume_path))
     else: # if not, assume fresh training instance and will initially generate cluster centroids
-        print('===> Finding cluster centroids')
-
-        print('===> Loading dataset(s) for clustering')
-        train_dataset = MSLS(opt.dataset_root_dir, mode='test', cities='train', transform=input_transform(),
-                             bs=int(config['train']['cachebatchsize']), threads=opt.threads,
-                             margin=float(config['train']['margin']))
-
-        print('===> Loading model for clustering')
+        print('===> Loading model')
         config['global_params']['num_clusters'] = config['train']['num_clusters']
 
         model = get_model(encoder, encoder_dim, opt, config['global_params'], append_pca_layer=False)
@@ -383,6 +376,13 @@ if __name__ == "__main__":
             else:
                 raise FileNotFoundError("=> no cluster data found at '{}'".format(opt.cluster_path))
         else:
+            print('===> Finding cluster centroids')
+
+            print('===> Loading dataset(s) for clustering')
+            train_dataset = MSLS(opt.dataset_root_dir, mode='test', cities='train', transform=input_transform(),
+                                 bs=int(config['train']['cachebatchsize']), threads=opt.threads,
+                                 margin=float(config['train']['margin']))
+
             model = model.to(device)
 
             print('===> Calculating descriptors and clusters')
@@ -428,7 +428,7 @@ if __name__ == "__main__":
 
     print('===> Loading dataset(s)')
     exlude_panos_training = not config['train'].getboolean('includepanos')
-    train_dataset = MSLS(opt.dataset_root_dir, mode='train', transform=input_transform(),
+    train_dataset = MSLS(opt.dataset_root_dir, mode='train', nNeg=int(config['train']['nNeg']), transform=input_transform(),
                          bs=int(config['train']['cachebatchsize']), threads=opt.threads, margin=float(config['train']['margin']),
                          exclude_panos=exlude_panos_training)
 
@@ -450,9 +450,7 @@ if __name__ == "__main__":
     not_improved = 0
     best_score = 0
     if opt.resume_path:
-        # noinspection PyUnboundLocalVariable
-        if 'not_improved' in checkpoint:
-            not_improved = checkpoint['not_improved']
+        not_improved = checkpoint['not_improved']
         best_score = checkpoint['best_score']
 
     for epoch in trange(opt.start_epoch + 1, opt.nEpochs + 1, desc='Epoch number'.rjust(15), position=0):
