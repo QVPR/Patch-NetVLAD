@@ -123,6 +123,28 @@ We provide the `match_two.py` script which computes the Patch-NetVLAD features f
 
 The script will print a score value as an output, where a larger score indicates more similar images and a lower score means dissimilar images. The function also outputs a matching figure, showing the patch correspondances (after RANSAC) between the two images. The figure is saved as `results/patchMatchings.png`.
 
+### Training
+```bash
+python train.py \
+--config_path patchnetvlad/configs/train.ini \
+--cache_path=/path/to/your/desired/cache/folder \
+--save_path=/path/to/your/desired/checkpoint/save/folder \
+--dataset_root_dir=/path/to/your/mapillary/dataset
+```
+
+To begin, request, download and unzip the Mapillary Street-level Sequences dataset (https://github.com/mapillary/mapillary_sls).
+The provided script will train a new network from scratch, to resume training add --resume_path and set to a full path, filename and extension to an existing checkpoint file. Note to resume our provided models, first remove the WPCA layers.
+
+After training a model, PCA can be added using add_pca.py.
+```bash
+python add_pca.py \
+--config_path patchnetvlad/configs/train.ini \
+--resume_path=full/path/with/extension/to/your/saved/checkpoint \
+--dataset_root_dir=/path/to/your/mapillary/dataset
+```
+
+This will add an additional checkpoint file to the same folder as resume_path, except including a WPCA layer.
+
 ## FAQ
 ![Patch-NetVLAD qualitative results](./assets/patch_netvlad_qualitative_results.jpg)
 

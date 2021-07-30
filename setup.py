@@ -53,11 +53,12 @@ setup(name='patchnetvlad',
       keywords=[
           'python', 'place recognition', 'image retrieval', 'computer vision', 'robotics'
       ],
-      scripts=['feature_extract.py', 'feature_match.py', 'match_two.py', 'match_realtime.py' , 'download_models.py'],
+      scripts=['feature_extract.py', 'feature_match.py', 'train.py', 'match_two.py', 'match_realtime.py', 'download_models.py'],
       entry_points={
         'console_scripts': ['patchnetvlad-match-two=match_two:main',
                             'patchnetvlad-feature-match=feature_match:main',
                             'patchnetvlad-feature-extract=feature_extract:main',
+                            'patchnetvlad-train=train:main',
                             'patchnetvlad-match-realtime=match_realtime:main',
                             'patchnetvlad-download-models=download_models:download_all_models'],
       },

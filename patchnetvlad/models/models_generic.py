@@ -53,6 +53,10 @@ def get_backend():
     enc_dim = 512
     enc = models.vgg16()
     layers = list(enc.features.children())[:-2]
+    # only train conv5_1, conv5_2, and conv5_3 (leave rest same as Imagenet trained weights)
+    for layer in layers[:-5]:
+        for p in layer.parameters():
+            p.requires_grad = False
     enc = nn.Sequential(*layers)
     return enc_dim, enc
 

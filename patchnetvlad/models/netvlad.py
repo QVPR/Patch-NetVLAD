@@ -62,7 +62,6 @@ class NetVLAD(nn.Module):
         self.use_faiss = use_faiss
 
     def init_params(self, clsts, traindescs):
-        # TODO replace numpy ops with pytorch ops
         if not self.vladv2:
             clstsAssign = clsts / np.linalg.norm(clsts, axis=1, keepdims=True)
             dots = np.dot(clstsAssign, traindescs.T)
