@@ -25,9 +25,69 @@ Additional functions used during training.
 '''
 
 
+import numpy as np
+from scipy.sparse.linalg import eigs
 import torch
 import shutil
 from os.path import join
+
+
+def pca(x: np.ndarray, num_pcs=None, subtract_mean=True):
+    # translated from MATLAB:
+    # - https://github.com/Relja/relja_matlab/blob/master/relja_PCA.m
+    # - https://github.com/Relja/netvlad/blob/master/addPCA.m
+
+    # assumes x = nvectors x ndims
+    x = x.T  # matlab code is ndims x nvectors, so transpose
+
+    n_points = x.shape[1]
+    n_dims = x.shape[0]
+
+    if num_pcs is None:
+        num_pcs = n_dims
+
+    print('PCA for {} points of dimension {} to PCA dimension {}'.format(n_points, n_dims, num_pcs))
+
+    if subtract_mean:
+        # Subtract mean
+        mu = np.mean(x, axis=1)
+        x = (x.T - mu).T
+    else:
+        mu = np.zeros(n_dims)
+
+    assert num_pcs < n_dims
+
+    if n_dims <= n_points:
+        do_dual = False
+        # x2 = dims * dims
+        x2 = np.matmul(x, x.T) / (n_points - 1)
+    else:
+        do_dual = True
+        # x2 = vectors * vectors
+        x2 = np.matmul(x.T, x) / (n_points - 1)
+
+    if num_pcs < x2.shape[0]:
+        print('Compute {} eigenvectors'.format(num_pcs))
+        lams, u = eigs(x2, num_pcs)
+    else:
+        print('Compute eigenvectors')
+        lams, u = np.linalg.eig(x2)
+
+    assert np.all(np.isreal(lams)) and np.all(np.isreal(u))
+    lams = np.real(lams)
+    u = np.real(u)
+
+    sort_indices = np.argsort(lams)[::-1]
+    lams = lams[sort_indices]
+    u = u[:, sort_indices]
+
+    if do_dual:
+        # U = x * ( U * diag(1./sqrt(max(lams,1e-9))) / sqrt(nPoints-1) );
+        diag = np.diag(1. / np.sqrt(np.maximum(lams, 1e-9)))
+        utimesdiag = np.matmul(u, diag)
+        u = np.matmul(x, utimesdiag / np.sqrt(n_points - 1))
+
+    return u, lams, mu
 
 
 def humanbytes(B):

@@ -21,6 +21,10 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
+Significant parts of our code are based on [Nanne's pytorch-netvlad repository]
+(https://github.com/Nanne/pytorch-NetVlad/), as well as some parts from the [Mapillary SLS repository]
+(https://github.com/mapillary/mapillary_sls)
+
 Initialises NetVLAD clusters before training.
 '''
 

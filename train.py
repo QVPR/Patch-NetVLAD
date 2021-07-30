@@ -23,6 +23,10 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
+Significant parts of our code are based on [Nanne's pytorch-netvlad repository]
+(https://github.com/Nanne/pytorch-NetVlad/), as well as some parts from the [Mapillary SLS repository]
+(https://github.com/mapillary/mapillary_sls)
+
 This code trains the NetVLAD neural network used to extract Patch-NetVLAD features.
 '''
 
@@ -41,9 +45,7 @@ import tempfile
 
 import torch
 import torch.nn as nn
-
 import torch.optim as optim
-
 
 import h5py
 
@@ -90,9 +92,6 @@ if __name__ == "__main__":
 
     opt = parser.parse_args()
     print(opt)
-
-    # TODO: add some kind of check if a resumed ckpt has different parameters compared to the train.ini file
-    # TODO: implement training on pitts
 
     configfile = opt.config_path
     assert os.path.isfile(configfile)
@@ -169,8 +168,6 @@ if __name__ == "__main__":
             traindescs = h5.get("descriptors")[...]
             model.pool.init_params(clsts, traindescs)
             del clsts, traindescs
-
-        print('debugpoint')
 
     isParallel = False
     if int(config['global_params']['nGPU']) > 1 and torch.cuda.device_count() > 1:
