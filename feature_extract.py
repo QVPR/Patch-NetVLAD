@@ -151,13 +151,14 @@ def main():
         config['global_params']['num_clusters'] = str(checkpoint['state_dict']['pool.centroids'].shape[0])
 
         model = get_model(encoder, encoder_dim, opt, config['global_params'], append_pca_layer=True)
-
+        model.load_state_dict(checkpoint['state_dict'])
+        
         if int(config['global_params']['nGPU']) > 1 and torch.cuda.device_count() > 1:
             model.encoder = nn.DataParallel(model.encoder)
             # if opt.mode.lower() != 'cluster':
             model.pool = nn.DataParallel(model.pool)
 
-        model.load_state_dict(checkpoint['state_dict'])
+       
         model = model.to(device)
         print("=> loaded checkpoint '{}'".format(resume_ckpt, ))
     else:
