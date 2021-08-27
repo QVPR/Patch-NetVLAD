@@ -26,7 +26,7 @@ def ask_yesno(question):
 
 
 def download_all_models(ask_for_permission=False):
-    ssl._create_default_https_context = ssl._create_unverified_context()
+    ssl._create_default_https_context = ssl._create_unverified_context
     dest_dir = os.path.join(PATCHNETVLAD_ROOT_DIR, 'pretrained_models')
     if not ask_for_permission or ask_yesno("Auto-download pretrained models into " + dest_dir + " (takes around 2GB of space)? Yes/no."):
         if not os.path.isfile(os.path.join(dest_dir, "mapillary_WPCA128.pth.tar")):
