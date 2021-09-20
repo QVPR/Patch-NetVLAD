@@ -77,7 +77,6 @@ def plot_two(cv_im_one, cv_im_two, inlier_keypoints_one, inlier_keypoints_two, p
     im_allpatch_matches = cv2.drawMatches(cv_im_one, kp_all1, cv_im_two, kp_all2,
                                           matches_all, None, matchColor=(0, 255, 0), flags=2)
     if plot_save_path is None:
-        im_allpatch_matches = cv2.cvtColor(im_allpatch_matches, cv2.COLOR_RGB2BGR)
         cv2.imshow('frame', im_allpatch_matches)
     else:
         im_allpatch_matches = cv2.cvtColor(im_allpatch_matches, cv2.COLOR_BGR2RGB)
