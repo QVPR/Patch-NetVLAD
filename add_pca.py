@@ -95,7 +95,7 @@ if __name__ == "__main__":
             checkpoint = torch.load(opt.resume_path, map_location=lambda storage, loc: storage)
             config['global_params']['num_clusters'] = str(checkpoint['state_dict']['pool.centroids'].shape[0])
 
-            model = get_model(encoder, encoder_dim, opt, config['global_params'], append_pca_layer=False)
+            model = get_model(encoder, encoder_dim, config['global_params'], append_pca_layer=False)
 
             model.load_state_dict(checkpoint['state_dict'])
             opt.start_epoch = checkpoint['epoch']

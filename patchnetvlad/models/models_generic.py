@@ -61,7 +61,7 @@ def get_backend():
     return enc_dim, enc
 
 
-def get_model(encoder, encoder_dim, opt, config, append_pca_layer=False):
+def get_model(encoder, encoder_dim, config, append_pca_layer=False):
     # config['global_params'] is passed as config
     nn_model = nn.Module()
     nn_model.add_module('encoder', encoder)
@@ -82,7 +82,7 @@ def get_model(encoder, encoder_dim, opt, config, append_pca_layer=False):
         global_pool = nn.AdaptiveAvgPool2d((1, 1))
         nn_model.add_module('pool', nn.Sequential(*[global_pool, Flatten(), L2Norm()]))
     else:
-        raise ValueError('Unknown pooling type: ' + opt.pooling)
+        raise ValueError('Unknown pooling type: ' + config['pooling'].lower())
 
     if append_pca_layer:
         num_pcs = int(config['num_pcs'])

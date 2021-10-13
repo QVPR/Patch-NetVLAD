@@ -124,7 +124,7 @@ if __name__ == "__main__":
             checkpoint = torch.load(opt.resume_path, map_location=lambda storage, loc: storage)
             config['global_params']['num_clusters'] = str(checkpoint['state_dict']['pool.centroids'].shape[0])
 
-            model = get_model(encoder, encoder_dim, opt, config['global_params'], append_pca_layer=False)
+            model = get_model(encoder, encoder_dim, config['global_params'], append_pca_layer=False)
 
             model.load_state_dict(checkpoint['state_dict'])
             opt.start_epoch = checkpoint['epoch']
@@ -136,7 +136,7 @@ if __name__ == "__main__":
         print('===> Loading model')
         config['global_params']['num_clusters'] = config['train']['num_clusters']
 
-        model = get_model(encoder, encoder_dim, opt, config['global_params'], append_pca_layer=False)
+        model = get_model(encoder, encoder_dim, config['global_params'], append_pca_layer=False)
 
         initcache = join(opt.cache_path, 'centroids', 'vgg16_' + 'mapillary_' + config['train'][
                                       'num_clusters'] + '_desc_cen.hdf5')

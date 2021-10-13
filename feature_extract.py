@@ -150,7 +150,7 @@ def main():
         assert checkpoint['state_dict']['WPCA.0.bias'].shape[0] == int(config['global_params']['num_pcs'])
         config['global_params']['num_clusters'] = str(checkpoint['state_dict']['pool.centroids'].shape[0])
 
-        model = get_model(encoder, encoder_dim, opt, config['global_params'], append_pca_layer=True)
+        model = get_model(encoder, encoder_dim, config['global_params'], append_pca_layer=True)
         model.load_state_dict(checkpoint['state_dict'])
         
         if int(config['global_params']['nGPU']) > 1 and torch.cuda.device_count() > 1:
