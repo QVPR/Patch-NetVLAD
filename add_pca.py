@@ -49,6 +49,7 @@ from patchnetvlad.tools import PATCHNETVLAD_ROOT_DIR
 from tqdm.auto import tqdm
 
 from patchnetvlad.training_tools.msls import MSLS, ImagesFromList
+from patchnetvlad.tools.datasets import PlaceDataset
 
 
 if __name__ == "__main__":
@@ -60,6 +61,7 @@ if __name__ == "__main__":
                         help='Full path and name (with extension) to load checkpoint from, for resuming training.')
     parser.add_argument('--dataset_root_dir', type=str, default='/work/qvpr/data/raw/Mapillary_Street_Level_Sequences',
                         help='Root directory of dataset')
+    parser.add_argument('--dataset_choice', type=str, default='mapillary', help='choice of mapillary or pitts, for PCA')
     parser.add_argument('--threads', type=int, default=6, help='Number of threads for each data loader to use')
     parser.add_argument('--nocuda', action='store_true', help='If true, use CPU only. Else use GPU.')
 
@@ -120,25 +122,42 @@ if __name__ == "__main__":
 
     print('===> Loading PCA dataset(s)')
 
-    exlude_panos_training = not config['train'].getboolean('includepanos')
-
-    pca_train_set = MSLS(opt.dataset_root_dir, mode='test', cities='train',
-                         transform=input_transform(),
-                         bs=int(config['train']['cachebatchsize']), threads=opt.threads,
-                         margin=float(config['train']['margin']),
-                         exclude_panos=exlude_panos_training)
-
     nFeatures = 10000
-    if nFeatures > len(pca_train_set.dbImages):
-        nFeatures = len(pca_train_set.dbImages)
+    if opt.dataset_choice == 'mapillary':
+        exlude_panos_training = not config['train'].getboolean('includepanos')
 
-    sampler = SubsetRandomSampler(np.random.choice(len(pca_train_set.dbImages), nFeatures, replace=False))
+        pca_train_set = MSLS(opt.dataset_root_dir, mode='test', cities='train',
+                             transform=input_transform(),
+                             bs=int(config['train']['cachebatchsize']), threads=opt.threads,
+                             margin=float(config['train']['margin']),
+                             exclude_panos=exlude_panos_training)
 
-    data_loader = DataLoader(
-        dataset=ImagesFromList(pca_train_set.dbImages, transform=input_transform()),
-        num_workers=opt.threads, batch_size=int(config['train']['cachebatchsize']), shuffle=False,
-        pin_memory=cuda,
-        sampler=sampler)
+        if nFeatures > len(pca_train_set.dbImages):
+            nFeatures = len(pca_train_set.dbImages)
+
+        sampler = SubsetRandomSampler(np.random.choice(len(pca_train_set.dbImages), nFeatures, replace=False))
+
+        data_loader = DataLoader(
+            dataset=ImagesFromList(pca_train_set.dbImages, transform=input_transform()),
+            num_workers=opt.threads, batch_size=int(config['train']['cachebatchsize']), shuffle=False,
+            pin_memory=cuda,
+            sampler=sampler)
+    elif opt.dataset_choice == 'pitts':
+        dataset_file_path = join(PATCHNETVLAD_ROOT_DIR, 'dataset_imagenames', 'pitts30k_imageNames_index.txt')
+        pca_train_set = PlaceDataset(None, dataset_file_path, opt.dataset_root_dir, None, config['train'])
+
+        if nFeatures > len(pca_train_set.images):
+            nFeatures = len(pca_train_set.images)
+
+        sampler = SubsetRandomSampler(np.random.choice(len(pca_train_set.images), nFeatures, replace=False))
+
+        data_loader = DataLoader(
+            dataset=ImagesFromList(pca_train_set.images, transform=input_transform()),
+            num_workers=opt.threads, batch_size=int(config['train']['cachebatchsize']), shuffle=False,
+            pin_memory=cuda,
+            sampler=sampler)
+    else:
+        raise ValueError('Unknown dataset choice: ' + opt.dataset_choice)
 
     print('===> Do inference to extract features and save them.')
 
