@@ -104,9 +104,21 @@ def feature_match(eval_set, device, opt, config):
     input_index_local_features_prefix = join(opt.index_input_features_dir, 'patchfeats')
     input_index_global_features_prefix = join(opt.index_input_features_dir, 'globalfeats.npy')
 
-    qFeat = np.load(input_query_global_features_prefix)
+    qFeat = []
+    for q_idx in range(eval_set.numQ):
+        image_name_query = os.path.splitext(os.path.basename(eval_set.images[eval_set.numDb + q_idx]))[0]
+        qfilename = input_query_local_features_prefix + '_' + 'global_' + image_name_query + '.npy'
+        qFeat.append(np.load(qfilename))
+    qFeat = np.array(qFeat)
+
+    dbFeat = []
+    for candidate in range(eval_set.numDb):
+        image_name_index = os.path.splitext(os.path.basename(eval_set.images[candidate]))[0]
+        dbfilename = input_index_local_features_prefix + '_' + 'global_' + image_name_index + '.npy'
+        dbFeat.append(np.load(dbfilename))
+    dbFeat = np.array(dbFeat)
+
     pool_size = qFeat.shape[1]
-    dbFeat = np.load(input_index_global_features_prefix)
 
     if dbFeat.dtype != np.float32:
         qFeat = qFeat.astype('float32')

@@ -97,8 +97,10 @@ def feature_extract(eval_set, model, device, opt, config):
                 vlad_global = model.pool(image_encoding)
                 vlad_global_pca = get_pca_encoding(model, vlad_global)
                 db_feat[indices_np, :] = vlad_global_pca.detach().cpu().numpy()
-
-    np.save(output_global_features_filename, db_feat)
+            for val in indices_np:
+                image_name = os.path.splitext(os.path.basename(eval_set.images[val]))[0]
+                filename = output_local_features_prefix + '_' + 'global_' + image_name + '.npy'
+                np.save(filename, db_feat[val, :])
 
 
 def main():
