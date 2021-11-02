@@ -59,7 +59,7 @@ def calc_receptive_boxes(height, width):
 
     Returns:
       rf_boxes: [N, 4] receptive boxes tensor. Here N equals to height x width.
-      Each box is represented by [ymin, xmin, ymax, xmax].
+      Each box is represented by [xmin, ymin, xmax, ymax].
     """
 
     rf, stride, padding = [196.0, 16.0, 90.0]  # hardcoded for vgg-16 conv5_3
@@ -108,7 +108,7 @@ def calc_keypoint_centers_from_patches(config, patch_size_h, patch_size_w, strid
     for i in range(0, Hout, stride_h):
         for j in range(0, Wout, stride_w):
             keypoints[0, k] = ((boxes[j + (i * W), 0] + boxes[(j + (patch_size[1] - 1)) + (i * W), 2]) / 2)
-            keypoints[1, k] = ((boxes[j + ((i + 1) * W), 1] + boxes[j + ((i + (patch_size[0] - 1)) * W), 3]) / 2)
+            keypoints[1, k] = ((boxes[j + (i * W), 1] + boxes[j + ((i + (patch_size[0] - 1)) * W), 3]) / 2)
             indices[0, k] = j
             indices[1, k] = i
             k += 1
