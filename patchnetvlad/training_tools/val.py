@@ -89,19 +89,15 @@ def val(eval_set, model, encoder_dim, device, opt, config, writer, epoch_num=0, 
     qEndPosTot = 0
     dbEndPosTot = 0
     for cityNum, (qEndPos, dbEndPos) in enumerate(zip(eval_set.qEndPosList, eval_set.dbEndPosList)):
-        qEndPosTot += qEndPos
-        dbEndPosTot += dbEndPos
         faiss_index = faiss.IndexFlatL2(pool_size)
+        faiss_index.add(dbFeat[dbEndPosTot:dbEndPosTot+dbEndPos, :])
+        _, preds = faiss_index.search(qFeat[qEndPosTot:qEndPosTot+qEndPos, :], max(n_values))
         if cityNum == 0:
-            faiss_index.add(dbFeat[:dbEndPos, :])
-            _, preds = faiss_index.search(qFeat[:qEndPos, :], max(n_values))
             predictions = preds
         else:
-            faiss_index.add(dbFeat[prev_dbEndPosTot:dbEndPosTot, :])
-            _, preds = faiss_index.search(qFeat[prev_qEndPosTot:qEndPosTot, :], max(n_values))
             predictions = np.vstack((predictions, preds))
-        prev_qEndPosTot = qEndPosTot
-        prev_dbEndPosTot = dbEndPosTot
+        qEndPosTot += qEndPos
+        dbEndPosTot += dbEndPos
 
     correct_at_n = np.zeros(len(n_values))
     # TODO can we do this on the matrix in one go?
