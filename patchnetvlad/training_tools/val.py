@@ -82,10 +82,19 @@ def val(eval_set, model, encoder_dim, device, opt, config, writer, epoch_num=0, 
     tqdm.write('====> Calculating recall @ N')
     n_values = [1, 5, 10, 20, 50, 100]
 
-    _, predictions = faiss_index.search(qFeat, max(n_values))
-
     # for each query get those within threshold distance
     gt = eval_set.all_pos_indices
+
+    # hard-coded for CPH and SF. This fixes the val recall issue.
+    cph_faiss_index = faiss.IndexFlatL2(pool_size)
+    cph_faiss_index.add(dbFeat[:12556, :])
+    _, cph_predictions = cph_faiss_index.search(qFeat[:499, :], max(n_values))
+
+    sf_faiss_index = faiss.IndexFlatL2(pool_size)
+    sf_faiss_index.add(dbFeat[12556:, :])
+    _, sf_predictions = sf_faiss_index.search(qFeat[499:, :], max(n_values))
+
+    predictions = np.vstack((cph_predictions, sf_predictions))
 
     correct_at_n = np.zeros(len(n_values))
     # TODO can we do this on the matrix in one go?
