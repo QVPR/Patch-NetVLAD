@@ -82,10 +82,22 @@ def val(eval_set, model, encoder_dim, device, opt, config, writer, epoch_num=0, 
     tqdm.write('====> Calculating recall @ N')
     n_values = [1, 5, 10, 20, 50, 100]
 
-    _, predictions = faiss_index.search(qFeat, max(n_values))
-
     # for each query get those within threshold distance
     gt = eval_set.all_pos_indices
+
+    # any combination of mapillary cities will work as a val set
+    qEndPosTot = 0
+    dbEndPosTot = 0
+    for cityNum, (qEndPos, dbEndPos) in enumerate(zip(eval_set.qEndPosList, eval_set.dbEndPosList)):
+        faiss_index = faiss.IndexFlatL2(pool_size)
+        faiss_index.add(dbFeat[dbEndPosTot:dbEndPosTot+dbEndPos, :])
+        _, preds = faiss_index.search(qFeat[qEndPosTot:qEndPosTot+qEndPos, :], max(n_values))
+        if cityNum == 0:
+            predictions = preds
+        else:
+            predictions = np.vstack((predictions, preds))
+        qEndPosTot += qEndPos
+        dbEndPosTot += dbEndPos
 
     correct_at_n = np.zeros(len(n_values))
     # TODO can we do this on the matrix in one go?

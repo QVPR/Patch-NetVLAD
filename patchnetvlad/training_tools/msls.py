@@ -99,6 +99,8 @@ class MSLS(Dataset):
         self.dbImages = []
         self.sideways = []
         self.night = []
+        self.qEndPosList = []
+        self.dbEndPosList = []
 
         self.all_pos_indices = []
 
@@ -185,6 +187,9 @@ class MSLS(Dataset):
 
                 self.qImages.extend(qSeqKeys)
                 self.dbImages.extend(dbSeqKeys)
+
+                self.qEndPosList.append(len(qSeqKeys))
+                self.dbEndPosList.append(len(dbSeqKeys))
 
                 qData = qData.loc[unique_qSeqIdx]
                 dbData = dbData.loc[unique_dbSeqIdx]
