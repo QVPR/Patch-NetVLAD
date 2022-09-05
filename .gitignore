@@ -1,4 +1,5 @@
 # Custom stuff
+.DS_Store
 .idea
 .vscode
 patchnetvlad/pretrained_models/*
