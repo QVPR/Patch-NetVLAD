@@ -78,7 +78,7 @@ def get_model(encoder, encoder_dim, config, append_pca_layer=False):
     elif config['pooling'].lower() == 'max':
         global_pool = nn.AdaptiveMaxPool2d((1, 1))
         nn_model.add_module('pool', nn.Sequential(*[global_pool, Flatten(), L2Norm()]))
-    elif config['pooling'].pooling.lower() == 'avg':
+    elif config['pooling'].lower() == 'avg':
         global_pool = nn.AdaptiveAvgPool2d((1, 1))
         nn_model.add_module('pool', nn.Sequential(*[global_pool, Flatten(), L2Norm()]))
     else:
