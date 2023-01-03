@@ -40,7 +40,7 @@ The code is licensed under the [MIT License](./LICENSE).
 We recommend using conda (or better: mamba) to install all dependencies. If you have not yet installed conda/mamba, please download and install [`mambaforge`](https://github.com/conda-forge/miniforge).
 
 ```bash
-conda create -n patchnetvlad python=3.8 numpy pytorch-gpu torchvision natsort tqdm opencv pillow scikit-learn faiss matplotlib-base -c conda-forge
+conda create -n patchnetvlad python numpy pytorch-gpu torchvision natsort tqdm opencv pillow scikit-learn faiss matplotlib-base -c conda-forge
 
 conda activate patchnetvlad
 ```
