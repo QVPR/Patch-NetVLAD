@@ -179,6 +179,7 @@ def main():
     parser.add_argument('--ground_truth_path', type=str, default=None,
                         help='Path (with extension) to a file that stores the ground-truth data')
     parser.add_argument('--result_save_folder', type=str, default='results')
+    parser.add_argument('--posDistThr', type=int, default=None, help='Manually set ground truth threshold')
     parser.add_argument('--nocuda', action='store_true', help='If true, use CPU only. Else use GPU.')
 
     opt = parser.parse_args()
@@ -200,7 +201,8 @@ def main():
     if not os.path.isfile(opt.index_file_path):
         opt.index_file_path = join(PATCHNETVLAD_ROOT_DIR, 'dataset_imagenames', opt.index_file_path)
 
-    dataset = PlaceDataset(opt.query_file_path, opt.index_file_path, opt.dataset_root_dir, opt.ground_truth_path, config['feature_extract'])
+    dataset = PlaceDataset(opt.query_file_path, opt.index_file_path, opt.dataset_root_dir, opt.ground_truth_path,
+                           config['feature_extract'], posDistThr=opt.posDistThr)
 
     feature_match(dataset, device, opt, config)
 

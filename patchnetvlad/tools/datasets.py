@@ -53,7 +53,7 @@ def input_transform(resize=(480, 640)):
 
 
 class PlaceDataset(data.Dataset):
-    def __init__(self, query_file_path, index_file_path, dataset_root_dir, ground_truth_path, config):
+    def __init__(self, query_file_path, index_file_path, dataset_root_dir, ground_truth_path, config, posDistThr=None):
         super().__init__()
 
         self.queries, self.database, self.numQ, self.numDb, self.utmQ, self.utmDb, self.posDistThr = None, None, None, None, None, None, None
@@ -63,6 +63,8 @@ class PlaceDataset(data.Dataset):
             self.database, self.numDb = self.parse_text_file(index_file_path)
         if ground_truth_path is not None:
             self.utmQ, self.utmDb, self.posDistThr = self.parse_gt_file(ground_truth_path)
+        if posDistThr is not None:
+            self.posDistThr = posDistThr
 
         if self.queries is not None:
             self.images = self.database + self.queries
