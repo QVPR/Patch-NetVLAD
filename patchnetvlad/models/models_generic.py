@@ -23,6 +23,8 @@ SOFTWARE.
 '''
 
 
+from packaging.version import parse as parse_version
+import torchvision
 import torchvision.models as models
 import torch.nn as nn
 import torch.nn.functional as F
@@ -51,7 +53,11 @@ def get_pca_encoding(model, vlad_encoding):
 
 def get_backend():
     enc_dim = 512
-    enc = models.vgg16(weights='IMAGENET1K_V1')
+    if parse_version(torchvision.__version__) >= parse_version('0.13'):
+        enc = models.vgg16(weights='IMAGENET1K_V1')
+    else:
+        enc = models.vgg16(pretrained=True)
+
     layers = list(enc.features.children())[:-2]
     # only train conv5_1, conv5_2, and conv5_3 (leave rest same as Imagenet trained weights)
     for layer in layers[:-5]:
