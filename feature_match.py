@@ -138,7 +138,7 @@ def feature_match(eval_set, device, opt, config):
             predictions = np.array(predictions_new)
         else:
             # noinspection PyArgumentList
-            _, predictions = faiss_index.search(qFeat, min(len(qFeat), max(n_values)))
+            _, predictions = faiss_index.search(qFeat, min(len(dbFeat), max(n_values)))
 
     reranked_predictions = local_matcher(predictions, eval_set, input_query_local_features_prefix,
                                          input_index_local_features_prefix, config, device)
