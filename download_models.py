@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import os
+import argparse
 import urllib.request
 from patchnetvlad.tools import PATCHNETVLAD_ROOT_DIR
 
