@@ -59,10 +59,7 @@ def get_square_regions_from_integral(feat_integral, patch_size, patch_stride):
     """
     N, D, H, W = feat_integral.shape
 
-    if feat_integral.get_device() == -1:
-        conv_weight = torch.ones(D, 1, 2, 2)
-    else:
-        conv_weight = torch.ones(D, 1, 2, 2, device=feat_integral.get_device())
+    conv_weight = torch.ones(D, 1, 2, 2, device=feat_integral.device.type)
     conv_weight[:, :, 0, -1] = -1
     conv_weight[:, :, -1, 0] = -1
     feat_regions = torch.nn.functional.conv2d(feat_integral, conv_weight, stride=patch_stride, groups=D, dilation=patch_size)
