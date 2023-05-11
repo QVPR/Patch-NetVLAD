@@ -48,4 +48,9 @@ def download_all_models(ask_for_permission=False):
         print('Downloaded all pretrained models.')
 
 if __name__ == "__main__":
-    download_all_models()
+    parser = argparse.ArgumentParser(description='Download Pretrained Models for Patch-NetVLAD')
+    parser.add_argument('--ask_for_permission', action='store_true',
+                        help='Ask for permission before downloading pretrained models.')
+    args = parser.parse_args()
+
+    download_all_models(ask_for_permission=args.ask_for_permission)
