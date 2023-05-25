@@ -80,8 +80,11 @@ class PlaceDataset(data.Dataset):
         self.positives = None
         self.distances = None
 
+        crop_roi = None
+        if 'imagecrop' in config:
+            crop_roi = tuple([int(x) for x in config['imagecrop'].split(',')])
         self.resize = (int(config['imageresizeH']), int(config['imageresizeW']))
-        self.mytransform = input_transform(self.resize)
+        self.mytransform = input_transform(self.resize, crop_roi)
 
     def __getitem__(self, index):
         img = Image.open(self.images[index])
