@@ -27,6 +27,7 @@ into the design of the dataloader
 import os
 
 import torchvision.transforms as transforms
+import torchvision.transforms.functional as TF
 import torch.utils.data as data
 
 import numpy as np
@@ -36,20 +37,19 @@ from sklearn.neighbors import NearestNeighbors
 from patchnetvlad.tools import PATCHNETVLAD_ROOT_DIR
 
 
-def input_transform(resize=(480, 640)):
+def input_transform(resize=(480, 640), crop_roi=None):
+    trans = []
+    if crop_roi is not None and len(crop_roi) == 4 and all([x >= 0 for x in crop_roi]):
+        top, left, bottom, right = crop_roi
+        trans.append(transforms.Lambda(lambda x: TF.crop(x, top, left, bottom-top, right-left)))
     if resize[0] > 0 and resize[1] > 0:
-        return transforms.Compose([
-            transforms.Resize(resize),
-            transforms.ToTensor(),
-            transforms.Normalize(mean=[0.485, 0.456, 0.406],
-                                 std=[0.229, 0.224, 0.225]),
-        ])
-    else:
-        return transforms.Compose([
-            transforms.ToTensor(),
-            transforms.Normalize(mean=[0.485, 0.456, 0.406],
-                                 std=[0.229, 0.224, 0.225]),
-        ])
+        trans.append(transforms.Resize(resize))
+    trans.extend([
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.485, 0.456, 0.406],
+                             std=[0.229, 0.224, 0.225]),
+    ])
+    return transforms.Compose(trans)
 
 
 class PlaceDataset(data.Dataset):
