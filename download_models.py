@@ -30,22 +30,22 @@ def download_all_models(ask_for_permission=False):
     if not ask_for_permission or ask_yesno("Auto-download pretrained models into " + dest_dir + " (takes around 2GB of space)? Yes/no."):
         if not os.path.isfile(os.path.join(dest_dir, "mapillary_WPCA128.pth.tar")):
             print('Downloading mapillary_WPCA128.pth.tar')
-            urllib.request.urlretrieve("https://cloudstor.aarnet.edu.au/plus/s/vvr0jizjti0z2LR/download", os.path.join(dest_dir, "mapillary_WPCA128.pth.tar"))
+            urllib.request.urlretrieve("https://huggingface.co/TobiasRobotics/Patch-NetVLAD/resolve/main/mapillary_WPCA128.pth.tar?download=true", os.path.join(dest_dir, "mapillary_WPCA128.pth.tar"))
         if not os.path.isfile(os.path.join(dest_dir, "mapillary_WPCA512.pth.tar")):
             print('Downloading mapillary_WPCA512.pth.tar')
-            urllib.request.urlretrieve("https://cloudstor.aarnet.edu.au/plus/s/DFxbGgFwh1y1wAz/download", os.path.join(dest_dir, "mapillary_WPCA512.pth.tar"))
+            urllib.request.urlretrieve("https://huggingface.co/TobiasRobotics/Patch-NetVLAD/resolve/main/mapillary_WPCA512.pth.tar?download=true", os.path.join(dest_dir, "mapillary_WPCA512.pth.tar"))
         if not os.path.isfile(os.path.join(dest_dir, "mapillary_WPCA4096.pth.tar")):
             print('Downloading mapillary_WPCA4096.pth.tar')
-            urllib.request.urlretrieve("https://cloudstor.aarnet.edu.au/plus/s/ZgW7DMEpeS47ELI/download", os.path.join(dest_dir, "mapillary_WPCA4096.pth.tar"))
+            urllib.request.urlretrieve("https://huggingface.co/TobiasRobotics/Patch-NetVLAD/resolve/main/mapillary_WPCA4096.pth.tar?download=true", os.path.join(dest_dir, "mapillary_WPCA4096.pth.tar"))
         if not os.path.isfile(os.path.join(dest_dir, "pittsburgh_WPCA128.pth.tar")):
             print('Downloading pittsburgh_WPCA128.pth.tar')
-            urllib.request.urlretrieve("https://cloudstor.aarnet.edu.au/plus/s/2ORvaCckitjz4Sd/download", os.path.join(dest_dir, "pittsburgh_WPCA128.pth.tar"))
+            urllib.request.urlretrieve("https://huggingface.co/TobiasRobotics/Patch-NetVLAD/resolve/main/pitts_WPCA128.pth.tar?download=true", os.path.join(dest_dir, "pittsburgh_WPCA128.pth.tar"))
         if not os.path.isfile(os.path.join(dest_dir, "pittsburgh_WPCA512.pth.tar")):
             print('Downloading pittsburgh_WPCA512.pth.tar')
-            urllib.request.urlretrieve("https://cloudstor.aarnet.edu.au/plus/s/WKl45MoboSyB4SH/download", os.path.join(dest_dir, "pittsburgh_WPCA512.pth.tar"))
+            urllib.request.urlretrieve("https://huggingface.co/TobiasRobotics/Patch-NetVLAD/resolve/main/pitts_WPCA512.pth.tar?download=true", os.path.join(dest_dir, "pittsburgh_WPCA512.pth.tar"))
         if not os.path.isfile(os.path.join(dest_dir, "pittsburgh_WPCA4096.pth.tar")):
             print('Downloading pittsburgh_WPCA4096.pth.tar')
-            urllib.request.urlretrieve("https://cloudstor.aarnet.edu.au/plus/s/1aoTGbFjsekeKlB/download", os.path.join(dest_dir, "pittsburgh_WPCA4096.pth.tar"))
+            urllib.request.urlretrieve("https://huggingface.co/TobiasRobotics/Patch-NetVLAD/resolve/main/pitts_WPCA4096.pth.tar?download=true", os.path.join(dest_dir, "pittsburgh_WPCA4096.pth.tar"))
         print('Downloaded all pretrained models.')
 
 if __name__ == "__main__":
