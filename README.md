@@ -69,12 +69,12 @@ We provide several pre-trained models and configuration files. The pre-trained m
 
   # Manual download:
   cd pretrained_models
-  wget -O mapillary_WPCA128.pth.tar https://cloudstor.aarnet.edu.au/plus/s/vvr0jizjti0z2LR/download
-  wget -O mapillary_WPCA512.pth.tar https://cloudstor.aarnet.edu.au/plus/s/DFxbGgFwh1y1wAz/download
-  wget -O mapillary_WPCA4096.pth.tar https://cloudstor.aarnet.edu.au/plus/s/ZgW7DMEpeS47ELI/download
-  wget -O pittsburgh_WPCA128.pth.tar https://cloudstor.aarnet.edu.au/plus/s/2ORvaCckitjz4Sd/download
-  wget -O pittsburgh_WPCA512.pth.tar https://cloudstor.aarnet.edu.au/plus/s/WKl45MoboSyB4SH/download
-  wget -O pittsburgh_WPCA4096.pth.tar https://cloudstor.aarnet.edu.au/plus/s/1aoTGbFjsekeKlB/download
+  wget -O mapillary_WPCA128.pth.tar https://huggingface.co/TobiasRobotics/Patch-NetVLAD/resolve/main/mapillary_WPCA128.pth.tar?download=true
+  wget -O mapillary_WPCA512.pth.tar https://huggingface.co/TobiasRobotics/Patch-NetVLAD/resolve/main/mapillary_WPCA512.pth.tar?download=true
+  wget -O mapillary_WPCA4096.pth.tar https://huggingface.co/TobiasRobotics/Patch-NetVLAD/resolve/main/mapillary_WPCA4096.pth.tar?download=true
+  wget -O pittsburgh_WPCA128.pth.tar https://huggingface.co/TobiasRobotics/Patch-NetVLAD/resolve/main/pitts_WPCA128.pth.tar?download=true
+  wget -O pittsburgh_WPCA512.pth.tar https://huggingface.co/TobiasRobotics/Patch-NetVLAD/resolve/main/pitts_WPCA512.pth.tar?download=true
+  wget -O pittsburgh_WPCA4096.pth.tar https://huggingface.co/TobiasRobotics/Patch-NetVLAD/resolve/main/pitts_WPCA4096.pth.tar?download=true
   ```
 </details>
 
