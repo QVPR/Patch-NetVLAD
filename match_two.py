@@ -95,7 +95,10 @@ def match_two(model, device, config, im_one, im_two, plot_save_path):
 
     model.eval()
 
-    it = input_transform((int(config['feature_extract']['imageresizeH']), int(config['feature_extract']['imageresizeW'])))
+    crop_roi = None
+    if 'imagecrop' in config['feature_extract']:
+        crop_roi = tuple([int(x) for x in config['feature_extract']['imagecrop'].split(",")])
+    it = input_transform((int(config['feature_extract']['imageresizeH']), int(config['feature_extract']['imageresizeW'])), crop_roi)
 
     im_one_pil = Image.fromarray(cv2.cvtColor(im_one, cv2.COLOR_BGR2RGB))
     im_two_pil = Image.fromarray(cv2.cvtColor(im_two, cv2.COLOR_BGR2RGB))
@@ -148,6 +151,10 @@ def match_two(model, device, config, im_one, im_two, plot_save_path):
             tqdm.write('====> Plotting Local Features and save them to ' + str(join(plot_save_path, 'patchMatchings.png')))
 
         # using cv2 for their in-built keypoint correspondence plotting tools
+        if crop_roi is not None:
+            top, left, bottom, right = crop_roi
+            im_one = im_one[top:bottom,left:right]
+            im_two = im_two[top:bottom,left:right]
         cv_im_one = cv2.resize(im_one, (int(config['feature_extract']['imageresizeW']), int(config['feature_extract']['imageresizeH'])))
         cv_im_two = cv2.resize(im_two, (int(config['feature_extract']['imageresizeW']), int(config['feature_extract']['imageresizeH'])))
         # cv2 resize slightly different from torch, but for visualisation only not a big problem
