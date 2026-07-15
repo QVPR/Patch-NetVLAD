@@ -284,8 +284,8 @@ class MSLS(Dataset):
         # cast to np.arrays for indexing during training
         self.qIdx = np.asarray(self.qIdx)
         self.qImages = np.asarray(self.qImages)
-        self.pIdx = np.asarray(self.pIdx)
-        self.nonNegIdx = np.asarray(self.nonNegIdx)
+        self.pIdx = np.asarray(self.pIdx, dtype=object)
+        self.nonNegIdx = np.asarray(self.nonNegIdx, dtype=object)
         self.dbImages = np.asarray(self.dbImages)
         self.sideways = np.asarray(self.sideways)
         self.night = np.asarray(self.night)

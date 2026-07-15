@@ -45,6 +45,7 @@ import cv2
 
 from patchnetvlad.models.models_generic import get_backend, get_model
 from patchnetvlad.tools import PATCHNETVLAD_ROOT_DIR
+from patchnetvlad.tools.device import get_device, empty_device_cache
 from match_two import match_two
 
 
@@ -62,11 +63,7 @@ def main():
     config = configparser.ConfigParser()
     config.read(configfile)
 
-    cuda = not opt.nocuda
-    if cuda and not torch.cuda.is_available():
-        raise Exception("No GPU found, please run with --nocuda")
-
-    device = torch.device("cuda" if cuda else "cpu")
+    device = get_device(opt.nocuda)
 
     encoder_dim, encoder = get_backend()
 
@@ -114,8 +111,7 @@ def main():
 
     vid.release()
     cv2.destroyAllWindows()
-    torch.cuda.empty_cache()  # garbage clean GPU memory, a bug can occur when Pytorch doesn't automatically clear the
-    # memory after runs
+    empty_device_cache(device)
     print('Done')
 
 if __name__ == "__main__":

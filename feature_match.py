@@ -52,6 +52,7 @@ from tqdm.auto import tqdm
 from patchnetvlad.tools.datasets import PlaceDataset
 from patchnetvlad.models.local_matcher import local_matcher
 from patchnetvlad.tools import PATCHNETVLAD_ROOT_DIR
+from patchnetvlad.tools.device import get_device, empty_device_cache
 
 
 def compute_recall(gt, predictions, numQ, n_values, recall_str=''):
@@ -131,7 +132,7 @@ def feature_match(eval_set, device, opt, config):
             _, predictions = faiss_index.search(qFeat, max(n_values) * 12)  # 12 cutouts per panorama
             predictions_new = []
             for qIx, pred in enumerate(predictions):
-                _, idx = np.unique(np.floor(pred / 12).astype(np.int), return_index=True)
+                _, idx = np.unique(np.floor(pred / 12).astype(int), return_index=True)
                 pred = pred[np.sort(idx)]
                 pred = pred[:max(n_values)]
                 predictions_new.append(pred)
@@ -190,11 +191,7 @@ def main():
     config = configparser.ConfigParser()
     config.read(configfile)
 
-    cuda = not opt.nocuda
-    if cuda and not torch.cuda.is_available():
-        raise Exception("No GPU found, please run with --nocuda")
-
-    device = torch.device("cuda" if cuda else "cpu")
+    device = get_device(opt.nocuda)
 
     if not os.path.isfile(opt.query_file_path):
         opt.query_file_path = join(PATCHNETVLAD_ROOT_DIR, 'dataset_imagenames', opt.query_file_path)
@@ -206,8 +203,7 @@ def main():
 
     feature_match(dataset, device, opt, config)
 
-    torch.cuda.empty_cache()  # garbage clean GPU memory, a bug can occur when Pytorch doesn't automatically clear the
-                              # memory after runs
+    empty_device_cache(device)
     print('Done')
 
 
