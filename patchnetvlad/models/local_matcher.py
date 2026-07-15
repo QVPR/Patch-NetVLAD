@@ -64,7 +64,7 @@ def calc_receptive_boxes(height, width):
 
     rf, stride, padding = [196.0, 16.0, 90.0]  # hardcoded for vgg-16 conv5_3
 
-    x, y = torch.meshgrid(torch.arange(0, height), torch.arange(0, width))
+    x, y = torch.meshgrid(torch.arange(0, height), torch.arange(0, width), indexing="ij")
     coordinates = torch.reshape(torch.stack([y, x], dim=2), [-1, 2])
     # [y,x,y,x]
     point_boxes = torch.cat([coordinates, coordinates], 1)
