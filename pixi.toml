@@ -1,0 +1,36 @@
+[workspace]
+authors = [
+  "Stephen Hausler",
+  "Sourav Garg <sourav.garg@iiit.ac.in>",
+  "Ming Xu",
+  "Michael Milford <michael.milford@qut.edu.au>",
+  "Tobias Fischer <tobias.fischer@qut.edu.au>",
+]
+channels = ["conda-forge"]
+name = "patch-netvlad"
+platforms = ["linux-64", "linux-aarch64", "osx-64", "osx-arm64", "win-64"]
+version = "0.1.8"
+
+[tasks]
+
+[dependencies]
+python = "3.12.*"
+numpy = "*"
+pytorch = "*"
+torchvision = "*"
+natsort = "*"
+tqdm = "*"
+opencv = "*"
+pillow = "*"
+scikit-learn = "*"
+faiss = "*"
+matplotlib-base = "*"
+scipy = "*"
+h5py = "*"
+pandas = "*"
+tensorboardx = "*"
+packaging = "*"
+scikit-build-core = "*"
+
+[pypi-dependencies]
+patchnetvlad = { path = ".", editable = true }
