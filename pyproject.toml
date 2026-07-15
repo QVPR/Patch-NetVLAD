@@ -4,7 +4,7 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "patchnetvlad"
-version = "0.1.8"
+version = "0.2.0"
 description = "Patch-NetVLAD: An open-source Python implementation of the CVPR2021 paper"
 readme = "README.md"
 requires-python = ">=3.9"

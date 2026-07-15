@@ -9,7 +9,7 @@ authors = [
 channels = ["conda-forge"]
 name = "patch-netvlad"
 platforms = ["linux-64", "linux-aarch64", "osx-64", "osx-arm64", "win-64"]
-version = "0.1.8"
+version = "0.2.0"
 
 [tasks]
 
