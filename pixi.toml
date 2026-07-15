@@ -11,7 +11,61 @@ name = "patch-netvlad"
 platforms = ["linux-64", "linux-aarch64", "osx-64", "osx-arm64", "win-64"]
 version = "0.2.0"
 
-[tasks]
+[tasks.download-models]
+description = "Download pretrained Patch-NetVLAD models."
+cmd = "python download_models.py"
+
+[tasks.extract]
+description = "Extract Patch-NetVLAD features for an image list."
+args = [
+  "dataset_file",
+  "dataset_root",
+  "output_features",
+  { arg = "config", default = "patchnetvlad/configs/performance.ini" },
+]
+cmd = "patchnetvlad-feature-extract --config_path {{ config }} --dataset_file_path {{ dataset_file }} --dataset_root_dir {{ dataset_root }} --output_features_dir {{ output_features }}"
+
+[tasks.match]
+description = "Match extracted query features against index features."
+args = [
+  "query_file",
+  "index_file",
+  "query_features",
+  "index_features",
+  "dataset_root",
+  "result_dir",
+  { arg = "config", default = "patchnetvlad/configs/performance.ini" },
+]
+cmd = "patchnetvlad-feature-match --config_path {{ config }} --query_file_path {{ query_file }} --index_file_path {{ index_file }} --query_input_features_dir {{ query_features }} --index_input_features_dir {{ index_features }} --dataset_root_dir {{ dataset_root }} --result_save_folder {{ result_dir }}"
+
+[tasks.match-two]
+description = "Match two images with Patch-NetVLAD."
+args = [
+  { arg = "first_image", default = "patchnetvlad/example_images/tokyo_query.jpg" },
+  { arg = "second_image", default = "patchnetvlad/example_images/tokyo_db.png" },
+  { arg = "plot_dir", default = "patchnetvlad/results" },
+  { arg = "config", default = "patchnetvlad/configs/performance.ini" },
+]
+cmd = "patchnetvlad-match-two --config_path {{ config }} --first_im_path {{ first_image }} --second_im_path {{ second_image }} --plot_save_path {{ plot_dir }}"
+
+[tasks.train]
+description = "Train Patch-NetVLAD."
+args = [
+  "dataset_root",
+  "cache_path",
+  "save_path",
+  { arg = "config", default = "patchnetvlad/configs/train.ini" },
+]
+cmd = "patchnetvlad-train --config_path {{ config }} --dataset_root_dir {{ dataset_root }} --cache_path {{ cache_path }} --save_path {{ save_path }}"
+
+[tasks.add-pca]
+description = "Add PCA to a trained checkpoint."
+args = [
+  "resume_path",
+  "dataset_root",
+  { arg = "config", default = "patchnetvlad/configs/train.ini" },
+]
+cmd = "python add_pca.py --config_path {{ config }} --resume_path {{ resume_path }} --dataset_root_dir {{ dataset_root }}"
 
 [dependencies]
 python = "3.12.*"

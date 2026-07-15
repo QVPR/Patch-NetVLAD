@@ -50,7 +50,7 @@ We provide several pre-trained models and configuration files. The pre-trained m
   # the steps below are optional!
 
   # You can use the download script which automatically downloads the models:
-  pixi run python ./download_models.py
+  pixi run download-models
 
   # Manual download:
   cd pretrained_models
@@ -63,7 +63,7 @@ We provide several pre-trained models and configuration files. The pre-trained m
   wget -O landmarks_WPCA4096.pth.tar https://huggingface.co/TobiasRobotics/Patch-NetVLAD/resolve/main/landmarks_WPCA4096.pth.tar?download=true
   ```
 </details>
-The `pixi.toml` installs Patch-NetVLAD as an editable Python package, so the command-line shortcuts are available through `pixi run`.
+The `pixi.toml` installs Patch-NetVLAD as an editable Python package and provides tasks for common workflows. To pass less common script options, append them after `--`, for example `pixi run extract ... -- --nocuda`.
 
 ## Quick start
 
@@ -71,26 +71,24 @@ The `pixi.toml` installs Patch-NetVLAD as an editable Python package, so the com
 Replace `performance.ini` with `speed.ini` or `storage.ini` if you want, and adapt the dataset paths - examples are given for the Pittsburgh30k dataset (simply replace `pitts30k` with `tokyo247` or `nordland` for these datasets).
 
 ```bash
-pixi run python feature_extract.py \
-  --config_path patchnetvlad/configs/performance.ini \
-  --dataset_file_path=pitts30k_imageNames_index.txt \
-  --dataset_root_dir=/path/to/your/pitts/dataset \
-  --output_features_dir patchnetvlad/output_features/pitts30k_index
+pixi run extract \
+  pitts30k_imageNames_index.txt \
+  /path/to/your/pitts/dataset \
+  patchnetvlad/output_features/pitts30k_index
 ```
 
 Repeat for the query images by replacing `_index` with `_query`. Note that you have to adapt `dataset_root_dir`.
 
 ### Feature matching (dataset)
 ```bash
-pixi run python feature_match.py \
-  --config_path patchnetvlad/configs/performance.ini \
-  --dataset_root_dir=/path/to/your/pitts/dataset \
-  --query_file_path=pitts30k_imageNames_query.txt \
-  --index_file_path=pitts30k_imageNames_index.txt \
-  --query_input_features_dir patchnetvlad/output_features/pitts30k_query \
-  --index_input_features_dir patchnetvlad/output_features/pitts30k_index \
-  --ground_truth_path patchnetvlad/dataset_gt_files/pitts30k_test.npz \
-  --result_save_folder patchnetvlad/results/pitts30k
+pixi run match \
+  pitts30k_imageNames_query.txt \
+  pitts30k_imageNames_index.txt \
+  patchnetvlad/output_features/pitts30k_query \
+  patchnetvlad/output_features/pitts30k_index \
+  /path/to/your/pitts/dataset \
+  patchnetvlad/results/pitts30k \
+  -- --ground_truth_path patchnetvlad/dataset_gt_files/pitts30k_test.npz
 ```
 
 Note that providing `ground_truth_path` is optional.
@@ -102,10 +100,9 @@ This will create three output files in the folder specified by `result_save_fold
 
 ### Feature matching (two files)
 ```bash
-pixi run python match_two.py \
---config_path patchnetvlad/configs/performance.ini \
---first_im_path=patchnetvlad/example_images/tokyo_query.jpg \
---second_im_path=patchnetvlad/example_images/tokyo_db.png
+pixi run match-two \
+  patchnetvlad/example_images/tokyo_query.jpg \
+  patchnetvlad/example_images/tokyo_db.png
 ```
 
 We provide the `match_two.py` script which computes the Patch-NetVLAD features for two given images and then determines the local feature matching between these images. While we provide example images, any image pair can be used.
@@ -114,11 +111,10 @@ The script will print a score value as an output, where a larger score indicates
 
 ### Training
 ```bash
-pixi run python train.py \
---config_path patchnetvlad/configs/train.ini \
---cache_path=/path/to/your/desired/cache/folder \
---save_path=/path/to/your/desired/checkpoint/save/folder \
---dataset_root_dir=/path/to/your/mapillary/dataset
+pixi run train \
+  /path/to/your/mapillary/dataset \
+  /path/to/your/desired/cache/folder \
+  /path/to/your/desired/checkpoint/save/folder
 ```
 
 To begin, request, download and unzip the Mapillary Street-level Sequences dataset (https://github.com/mapillary/mapillary_sls).
@@ -126,10 +122,9 @@ The provided script will train a new network from scratch, to resume training ad
 
 After training a model, PCA can be added using add_pca.py.
 ```bash
-pixi run python add_pca.py \
---config_path patchnetvlad/configs/train.ini \
---resume_path=full/path/with/extension/to/your/saved/checkpoint \
---dataset_root_dir=/path/to/your/mapillary/dataset
+pixi run add-pca \
+  full/path/with/extension/to/your/saved/checkpoint \
+  /path/to/your/mapillary/dataset
 ```
 
 This will add an additional checkpoint file to the same folder as resume_path, except including a WPCA layer.
