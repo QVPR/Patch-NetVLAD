@@ -48,6 +48,7 @@ import numpy as np
 from patchnetvlad.tools.datasets import PlaceDataset
 from patchnetvlad.models.models_generic import get_backend, get_model, get_pca_encoding
 from patchnetvlad.tools import PATCHNETVLAD_ROOT_DIR
+from patchnetvlad.tools.device import get_device, empty_device_cache
 
 
 def feature_extract(eval_set, model, device, opt, config):
@@ -61,7 +62,7 @@ def feature_extract(eval_set, model, device, opt, config):
 
     test_data_loader = DataLoader(dataset=eval_set, num_workers=int(config['global_params']['threads']),
                                   batch_size=int(config['feature_extract']['cacheBatchSize']),
-                                  shuffle=False, pin_memory=(not opt.nocuda))
+                                  shuffle=False, pin_memory=(device.type == "cuda"))
 
     model.eval()
     with torch.no_grad():
@@ -121,11 +122,7 @@ def main():
     config = configparser.ConfigParser()
     config.read(configfile)
 
-    cuda = not opt.nocuda
-    if cuda and not torch.cuda.is_available():
-        raise Exception("No GPU found, please run with --nocuda")
-
-    device = torch.device("cuda" if cuda else "cpu")
+    device = get_device(opt.nocuda)
 
     encoder_dim, encoder = get_backend()
 
@@ -173,8 +170,7 @@ def main():
 
     feature_extract(dataset, model, device, opt, config)
 
-    torch.cuda.empty_cache()  # garbage clean GPU memory, a bug can occur when Pytorch doesn't automatically clear the
-    # memory after runs
+    empty_device_cache(device)
     print('\n\nDone. Finished extracting and saving features')
 
 

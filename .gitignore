@@ -205,3 +205,6 @@ octave-workspace
 *.exe
 *.out
 *.app
+
+# Pixi local environments
+.pixi/

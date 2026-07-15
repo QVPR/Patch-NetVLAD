@@ -65,6 +65,11 @@ from tqdm.auto import trange
 from patchnetvlad.training_tools.msls import MSLS
 
 
+def main():
+    import runpy
+    runpy.run_path(__file__, run_name="__main__")
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Patch-NetVLAD-train')
 

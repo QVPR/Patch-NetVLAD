@@ -1,0 +1,54 @@
+[build-system]
+requires = ["scikit-build-core"]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "patchnetvlad"
+version = "0.2.0"
+description = "Patch-NetVLAD: An open-source Python implementation of the CVPR2021 paper"
+readme = "README.md"
+requires-python = ">=3.9"
+license = "MIT"
+authors = [
+  { name = "Stephen Hausler" },
+  { name = "Sourav Garg", email = "sourav.garg@iiit.ac.in" },
+  { name = "Ming Xu" },
+  { name = "Michael Milford", email = "michael.milford@qut.edu.au" },
+  { name = "Tobias Fischer", email = "tobias.fischer@qut.edu.au" },
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+]
+keywords = ["python", "place recognition", "image retrieval", "computer vision", "robotics"]
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/QVPR/Patch-NetVLAD"
+
+[project.scripts]
+patchnetvlad-match-two = "match_two:main"
+patchnetvlad-feature-match = "feature_match:main"
+patchnetvlad-feature-extract = "feature_extract:main"
+patchnetvlad-train = "train:main"
+patchnetvlad-match-realtime = "match_realtime:main"
+patchnetvlad-download-models = "download_models:download_all_models"
+
+[tool.scikit-build]
+wheel.packages = ["patchnetvlad"]
+wheel.py-api = "py3"
+sdist.include = [
+  "add_pca.py",
+  "download_models.py",
+  "feature_extract.py",
+  "feature_match.py",
+  "match_realtime.py",
+  "match_two.py",
+  "train.py",
+  "patchnetvlad/**",
+]

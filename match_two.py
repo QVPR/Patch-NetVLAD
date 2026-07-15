@@ -52,6 +52,7 @@ from patchnetvlad.tools.patch_matcher import PatchMatcher
 from patchnetvlad.tools.datasets import input_transform
 from patchnetvlad.models.local_matcher import calc_keypoint_centers_from_patches as calc_keypoint_centers_from_patches
 from patchnetvlad.tools import PATCHNETVLAD_ROOT_DIR
+from patchnetvlad.tools.device import get_device, empty_device_cache
 
 
 def apply_patch_weights(input_scores, num_patches, patch_weights):
@@ -175,11 +176,7 @@ def main():
     config = configparser.ConfigParser()
     config.read(configfile)
 
-    cuda = not opt.nocuda
-    if cuda and not torch.cuda.is_available():
-        raise Exception("No GPU found, please run with --nocuda")
-
-    device = torch.device("cuda" if cuda else "cpu")
+    device = get_device(opt.nocuda)
 
     encoder_dim, encoder = get_backend()
 
@@ -221,8 +218,7 @@ def main():
 
     match_two(model, device, config, im_one, im_two, opt.plot_save_path)
 
-    torch.cuda.empty_cache()  # garbage clean GPU memory, a bug can occur when Pytorch doesn't automatically clear the
-    # memory after runs
+    empty_device_cache(device)
     print('Done')
 
 if __name__ == "__main__":

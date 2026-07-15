@@ -1,17 +1,12 @@
 # Patch-NetVLAD: Multi-Scale Fusion of Locally-Global Descriptors for Place Recognition
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](./LICENSE)
 [![stars](https://img.shields.io/github/stars/QVPR/Patch-NetVLAD.svg?style=flat-square)](https://github.com/QVPR/Patch-NetVLAD/stargazers)
 [![GitHub issues](https://img.shields.io/github/issues/QVPR/Patch-NetVLAD.svg?style=flat-square)](https://github.com/QVPR/Patch-NetVLAD/issues)
 [![GitHub closed issues](https://img.shields.io/github/issues-closed-raw/QVPR/Patch-NetVLAD?style=flat-square)](https://github.com/QVPR/Patch-NetVLAD/issues?q=is%3Aissue+is%3Aclosed)
 [![GitHub repo size](https://img.shields.io/github/repo-size/QVPR/Patch-NetVLAD.svg?style=flat-square)](./README.md)
 [![QUT Centre for Robotics](https://img.shields.io/badge/collection-QUT%20Robotics-%23043d71?style=flat-square)](https://qcr.github.io/collection/vpr_overview/)
-
-[![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/patch-netvlad-multi-scale-fusion-of-locally/visual-localization-on-extended-cmu-seasons&style=flat-square)](https://paperswithcode.com/sota/visual-localization-on-extended-cmu-seasons?p=patch-netvlad-multi-scale-fusion-of-locally)
-[![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/patch-netvlad-multi-scale-fusion-of-locally/visual-place-recognition-on-mapillary-val&style=flat-square)](https://paperswithcode.com/sota/visual-place-recognition-on-mapillary-val?p=patch-netvlad-multi-scale-fusion-of-locally)
-[![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/patch-netvlad-multi-scale-fusion-of-locally/visual-place-recognition-on-nordland&style=flat-square)](https://paperswithcode.com/sota/visual-place-recognition-on-nordland?p=patch-netvlad-multi-scale-fusion-of-locally)
-[![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/patch-netvlad-multi-scale-fusion-of-locally/visual-place-recognition-on-pittsburgh-30k&style=flat-square)](https://paperswithcode.com/sota/visual-place-recognition-on-pittsburgh-30k?p=patch-netvlad-multi-scale-fusion-of-locally)
-[![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/patch-netvlad-multi-scale-fusion-of-locally/visual-localization-on-robotcar-seasons-v2&style=flat-square)](https://paperswithcode.com/sota/visual-localization-on-robotcar-seasons-v2?p=patch-netvlad-multi-scale-fusion-of-locally)
-[![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/patch-netvlad-multi-scale-fusion-of-locally/visual-place-recognition-on-tokyo247&style=flat-square)](https://paperswithcode.com/sota/visual-place-recognition-on-tokyo247?p=patch-netvlad-multi-scale-fusion-of-locally)
+[![arXiv](https://img.shields.io/badge/arXiv-2103.01486-b31b1b.svg?style=flat-square)](https://arxiv.org/abs/2103.01486)
+[![CVPR 2021](https://img.shields.io/badge/CVPR-2021-blue.svg?style=flat-square)](https://openaccess.thecvf.com/content/CVPR2021/html/Hausler_Patch-NetVLAD_Multi-Scale_Fusion_of_Locally-Global_Descriptors_for_Place_Recognition_CVPR_2021_paper.html)
 
 This repository contains code for the CVPR2021 paper "Patch-NetVLAD: Multi-Scale Fusion of Locally-Global Descriptors for Place Recognition"
 
@@ -37,21 +32,10 @@ When using code within this repository, please refer the following [paper](https
 The code is licensed under the [MIT License](./LICENSE).
 
 ## Installation
-We recommend using conda (or better: mamba) to install all dependencies. If you have not yet installed conda/mamba, please download and install [`mambaforge`](https://github.com/conda-forge/miniforge). Note that [issues with recent NumPy versions have been reported](https://github.com/QVPR/Patch-NetVLAD/issues/75) - please use `numpy=1.21` which we know works.
+We recommend using [pixi](https://pixi.sh) to install all dependencies from conda-forge.
 
 ```bash
-# On Linux:
-conda create -n patchnetvlad python numpy=1.21 pytorch-gpu torchvision natsort tqdm opencv pillow scikit-learn faiss matplotlib-base -c conda-forge
-# On MacOS (x86 Intel processor):
-conda create -n patchnetvlad python numpy=1.21 pytorch torchvision natsort tqdm opencv pillow scikit-learn faiss matplotlib-base -c conda-forge
-# On MacOS (ARM M1/M2 processor):
-conda create -n patchnetvlad python numpy=1.21 pytorch torchvision natsort tqdm opencv pillow scikit-learn faiss matplotlib-base -c conda-forge -c tobiasrobotics
-# On Windows:
-conda create -n patchnetvlad python numpy=1.21 natsort tqdm opencv pillow scikit-learn faiss matplotlib-base -c conda-forge
-conda activate patchnetvlad
-conda install pytorch torchvision torchaudio pytorch-cuda=11.7 -c pytorch -c nvidia
-
-conda activate patchnetvlad
+pixi install
 ```
 
 We provide several pre-trained models and configuration files. The pre-trained models will be downloaded automatically into the `pretrained_models` the first time feature extraction is performed.
@@ -66,7 +50,7 @@ We provide several pre-trained models and configuration files. The pre-trained m
   # the steps below are optional!
 
   # You can use the download script which automatically downloads the models:
-  python ./download_models.py
+  pixi run python ./download_models.py
 
   # Manual download:
   cd pretrained_models
@@ -79,12 +63,7 @@ We provide several pre-trained models and configuration files. The pre-trained m
   wget -O landmarks_WPCA4096.pth.tar https://huggingface.co/TobiasRobotics/Patch-NetVLAD/resolve/main/landmarks_WPCA4096.pth.tar?download=true
   ```
 </details>
-
-If you want to use the shortcuts `patchnetvlad-match-two`, `patchnetvlad-feature-match` and `patchnetvlad-feature-extract`, you also need to run (which also lets you use Patch-NetVLAD in a modular way):
-```bash
-pip3 install --no-deps -e .
-```
-
+The `pixi.toml` installs Patch-NetVLAD as an editable Python package, so the command-line shortcuts are available through `pixi run`.
 
 ## Quick start
 
@@ -92,7 +71,7 @@ pip3 install --no-deps -e .
 Replace `performance.ini` with `speed.ini` or `storage.ini` if you want, and adapt the dataset paths - examples are given for the Pittsburgh30k dataset (simply replace `pitts30k` with `tokyo247` or `nordland` for these datasets).
 
 ```bash
-python feature_extract.py \
+pixi run python feature_extract.py \
   --config_path patchnetvlad/configs/performance.ini \
   --dataset_file_path=pitts30k_imageNames_index.txt \
   --dataset_root_dir=/path/to/your/pitts/dataset \
@@ -103,7 +82,7 @@ Repeat for the query images by replacing `_index` with `_query`. Note that you h
 
 ### Feature matching (dataset)
 ```bash
-python feature_match.py \
+pixi run python feature_match.py \
   --config_path patchnetvlad/configs/performance.ini \
   --dataset_root_dir=/path/to/your/pitts/dataset \
   --query_file_path=pitts30k_imageNames_query.txt \
@@ -123,7 +102,7 @@ This will create three output files in the folder specified by `result_save_fold
 
 ### Feature matching (two files)
 ```bash
-python match_two.py \
+pixi run python match_two.py \
 --config_path patchnetvlad/configs/performance.ini \
 --first_im_path=patchnetvlad/example_images/tokyo_query.jpg \
 --second_im_path=patchnetvlad/example_images/tokyo_db.png
@@ -135,7 +114,7 @@ The script will print a score value as an output, where a larger score indicates
 
 ### Training
 ```bash
-python train.py \
+pixi run python train.py \
 --config_path patchnetvlad/configs/train.ini \
 --cache_path=/path/to/your/desired/cache/folder \
 --save_path=/path/to/your/desired/checkpoint/save/folder \
@@ -147,7 +126,7 @@ The provided script will train a new network from scratch, to resume training ad
 
 After training a model, PCA can be added using add_pca.py.
 ```bash
-python add_pca.py \
+pixi run python add_pca.py \
 --config_path patchnetvlad/configs/train.ini \
 --resume_path=full/path/with/extension/to/your/saved/checkpoint \
 --dataset_root_dir=/path/to/your/mapillary/dataset
